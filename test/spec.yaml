@@ -1,0 +1,61 @@
+email:
+ from_address: !spec
+   type: !!str ""
+   description: The 'from' address in emails sent from.
+   value: notify@example.com
+
+ username: !spec
+   type: !!str ""
+   description: Username for connecting to an SMTP gateway. Required only for SMTPBackend.
+   value: !optional
+
+ backend: !spec
+   type: !!str ""
+   description: Django email backend. Usually per environment, depending on where 
+     we want emails to go.
+   value: !required "must be set in the environment.yaml"
+   examples: 
+   - django.core.mail.backends.console.EmailBackend
+   - django.core.mail.backends.smtp.EmailBackend
+   
+ cruft: !spec
+   deprecated: true
+   type: !!str ""
+   value: Iamdead
+   description: Example of a deprecated setting.
+ 
+uris:
+ www: !spec
+   type: !URI
+   value: !URI http://www.google.com
+   description: 
+
+ smtp: !spec
+   type: !URI
+   value: !URI smtp://example.com:25/
+   description:
+   
+ mongo: !spec
+   type: !URI
+   value: !URI mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
+   description: 
+   
+ mongo-sock: !spec 
+   type: !URI
+   value: !URI mongodb:///tmp/mongodb-27017.sock
+   description: 
+
+ 
+misconfiguration_examples: 
+ invalid_value: !spec
+   type: !!int "1"
+   value: I am a string.
+   description: Here, the 'type' and type('value') will not match.
+
+# !host: required to be a resolvable address
+mqueue:
+  redis_host: !spec
+    type: !URI "redis:"
+    value: !required "from cluster"
+    description: foo
+    
