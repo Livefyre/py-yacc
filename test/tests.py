@@ -136,15 +136,16 @@ class TestConfigParserFacade(BaseTest):
         c = ConfigurationBuilder(v).build()
         f = ConfigParserFacade(v, c)
         
-        def compare(method, section, key):
+        def compare(method, section, key, type_):
             assert f.has_section(section)
             assert f.has_option(section, key)
             assert key in f.options(section)
             assert key in dict(f.items(section))
             assert method(section, key) == c.value(section, key), (section, key)
+            assert isinstance(method(section, key), type_)
         
-        compare(f.get, "email", "from_address")
-        compare(f.getint, "tests", "int")
-        compare(f.getboolean, "tests", "bool")
-        compare(f.getfloat, "tests", "float")
+        compare(f.get, "email", "from_address", basestring)
+        compare(f.getint, "tests", "int", int)
+        compare(f.getboolean, "tests", "bool", bool)
+        compare(f.getfloat, "tests", "float", float)
         
