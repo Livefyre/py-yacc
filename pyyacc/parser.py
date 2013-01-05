@@ -14,50 +14,39 @@ from yaml import load, dump
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Loader
     
-from pyyacc.objects import ValueSpec, Requirement, Optional
+from pyyacc.objects import ValueSpec, Requirement, Optional,\
+    ConfigurationDescriptor, ConfigSet
+from logging import getLogger
+
+LOG = getLogger(__file__)
 
 Loader.add_constructor("!spec", ValueSpec._yaml_constructor)
 Loader.add_constructor("!required", Requirement._yaml_constructor)
 Loader.add_constructor("!optional", Optional._yaml_constructor)
 Loader.add_constructor("!URI", lambda loader, node: urlparse.urlparse(loader.construct_scalar(node)))
-
-
-class Configuration(object):
-    class _proxy(object):
-        def __init__(self, config, section):
-            self.config = config
-            self.section = section 
-            
-        def __getattr__(self, name):
-            return self.config.get(self.section, name)
-    
-    def __init__(self, descriptor, params):
-        self._descriptor = descriptor
-        self._params = params
         
-    def get(self, section, name):
-        return self._params[section][name]
-    
-    def __getattr__(self, section):
-        return self._proxy(self, section)
-
 
 class ConfigurationBuilder(object):
     def __init__(self, descriptor):
         self.descriptor = descriptor
         
     def build(self, *overlays):
-        params = {}
+        params = ConfigSet()
         for section in self.descriptor.keys():
             params[section] = {}
             for key, setting in self.descriptor[section].items():
+                if not isinstance(setting, ValueSpec):
+                    LOG.debug("ignoring non-spec value for '%s': %s", key, setting)
+                    continue
                 value = setting.value
-                for o in overlays:
+                for i, o in enumerate(overlays):
                     if key in o.get(section, {}):
                         value = o[section][key]
+                        LOG.debug("%s.%s found in overlay %d", section, key, i)
                 if isinstance(value, Optional):
+                    LOG.debug("%s.%s is optional, but not defined, skipping", section, key)
                     continue
                 params[section][key] = value
         return params
@@ -66,6 +55,9 @@ class ConfigurationBuilder(object):
         errors = {}
         for section in self.descriptor.keys():
             for key, setting in self.descriptor[section].items():
+                if not isinstance(setting, ValueSpec):
+                    LOG.debug("ignoring non-spec value for '%s': %s", key, setting)
+                    continue
                 if isinstance(setting.value, Optional) and key not in params[section]:
                     continue
                 value = params[section][key]
@@ -77,22 +69,8 @@ class ConfigurationBuilder(object):
         return errors
     
 def parse(fd):
-    return load(fd, Loader)
-                
-
-if __name__ == '__main__':
-    import sys, pprint
-    descriptor = load(open(sys.argv[1]), Loader)
-    yamls = [load(open(f), Loader) for f in sys.argv[2:]]
-    print "*"*50, "Descriptor"
-    pprint.pprint(descriptor, depth=3)
-    b = ConfigurationBuilder(descriptor)
-    params = b.build(*yamls)
-    print "*"*50, "Params"
-    pprint.pprint(params)
-    print "*"*50, "Errors"
-    pprint.pprint(b.validate(params))
-    
-    c = Configuration(descriptor, params)
-    assert c.email.from_address == c.get("email", "from_address")
-    
+    """Return a ConfigurationDescriptor"""
+    v = load(fd, Loader)
+    if isinstance(v, dict):
+        return ConfigurationDescriptor(v)
+    return v

@@ -4,6 +4,13 @@ Created on Jan 4, 2013
 @author: nino
 '''
 
+class ConfigurationDescriptor(dict): 
+    pass
+
+class ConfigSet(dict):
+    def value(self, section, key):
+        return self[section][key]
+
 class ValueSpec(object):
     """Declares and documents acceptable values for a setting."""
     def __init__(self, value_type, description=None, value=None, examples=None, deprecated=None):

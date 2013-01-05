@@ -23,6 +23,20 @@ email:
    type: !!str ""
    value: Iamdead
    description: Example of a deprecated setting.
+
+tests:
+ int: !spec
+   type: !!int "0"
+   value: 1
+   description: 
+ bool: !spec
+   type: !!bool "true"
+   value: false
+   description:    
+ float: !spec
+   type: !!float "0.0"
+   value: 100.1
+   description:    
  
 uris:
  www: !spec
