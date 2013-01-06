@@ -13,8 +13,8 @@ class ConfigSet(dict):
 
 class ValueSpec(object):
     """Declares and documents acceptable values for a setting."""
-    def __init__(self, value_type, description=None, value=None, examples=None, deprecated=None):
-        self.obj_type = type(value_type)
+    def __init__(self, value_type, description=None, value=None, examples=None, deprecated=False):
+        self.obj_type = value_type
         self.value = value
         self.description = description
         self.examples = examples
@@ -23,7 +23,7 @@ class ValueSpec(object):
     @classmethod
     def _yaml_constructor(cls, loader, node):
         d = loader.construct_mapping(node)
-        d['value_type'] = d.pop('type')
+        d['value_type'] = type(d.pop('type'))
         if 'description' not in d:
             raise ValueError('description is required: %s' % d)
         return cls(**d)

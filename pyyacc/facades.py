@@ -35,4 +35,8 @@ class ConfigParserFacade(object):
         return self._params[section].keys() 
 
     def items(self, section):
-        return self._params[section].items() 
+        return self._params[section].items()
+    
+    def sections(self):
+        return self._params.keys()
+
