@@ -19,4 +19,7 @@ setup(
     classifiers=[
         "License :: OSI Approved :: BSD License",
     ],
+    entry_points={
+      'console_scripts': ['pyacc.validate = pyyacc.scripts.compile:main']
+    }
 )
