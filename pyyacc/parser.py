@@ -14,7 +14,7 @@ from yaml import load, dump
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
-    from yaml import Loader
+    from yaml import Loader, Dumper
     
 from pyyacc.objects import ValueSpec, Requirement, Optional,\
     ConfigurationDescriptor, ConfigSet
@@ -26,6 +26,8 @@ Loader.add_constructor("!spec", ValueSpec._yaml_constructor)
 Loader.add_constructor("!required", Requirement._yaml_constructor)
 Loader.add_constructor("!optional", Optional._yaml_constructor)
 Loader.add_constructor("!URI", lambda loader, node: urlparse.urlparse(loader.construct_scalar(node)))
+Loader.add_constructor("!uri", lambda loader, node: urlparse.urlparse(loader.construct_scalar(node)))
+Dumper.add_representer(urlparse.ParseResult, lambda dumper, data: dumper.represent_scalar("!uri", urlparse.urlunparse(data)))
         
 
 class ConfigurationBuilder(object):
@@ -51,7 +53,7 @@ class ConfigurationBuilder(object):
                 params[section][key] = value
         return params
     
-    def validate(self, params):
+    def validate(self, params, ignored=[]):
         errors = {}
         for section in self.descriptor.keys():
             for key, setting in self.descriptor[section].items():
@@ -62,15 +64,49 @@ class ConfigurationBuilder(object):
                     continue
                 value = params[section][key]
                 if isinstance(value, Requirement):
+                    if value.description in ignored:
+                        del params[section][key]
+                        continue
                     errors[(section, key)] = value
                     continue
                 if not isinstance(value, setting.obj_type):
-                    errors[(section, key)] = TypeError("expected %s, got %s" % (setting.obj_type, type(value)))
+                    errors[(section, key)] = TypeError("expected %s, got %s (from %s)" % (setting.obj_type, type(value), value))
         return errors
+
     
 def parse(fd):
-    """Return a ConfigurationDescriptor"""
+    """Parse the provided YAML. Assuming this is a well-formed map at the root, it returns a `ConfigurationDescriptor`."""
     v = load(fd, Loader)
     if isinstance(v, dict):
         return ConfigurationDescriptor(v)
     return v
+
+
+def unparse(stream, params, **kwargs):
+    """Serialize the parameters to the stream as YAML."""
+    dump(params, stream, Dumper, **kwargs)
+
+
+def build(*yamls):
+    """Produces a builder and compiled dictionary of params."""
+    if not yamls:
+        return None, None
+    desc = yamls[0]
+    descriptor = parse(open(desc))
+    builder = ConfigurationBuilder(descriptor)
+    params = builder.build(*[parse(open(f)) for f in yamls[1:]])
+    return builder, params
+
+
+if __name__ == '__main__':
+    import sys, pprint
+    yamls = sys.argv[1:]
+    builder, params = build(*yamls)
+    errs = builder.validate(params)
+    if errs:
+        for (section, key), err in errs.iteritems():
+            print "%s:\n  %s: %s" % (section, key, err)
+        sys.exit(1)
+    else:
+        print "No errors"
+        sys.exit(0)

@@ -23,7 +23,10 @@ class ValueSpec(object):
     @classmethod
     def _yaml_constructor(cls, loader, node):
         d = loader.construct_mapping(node)
-        d['value_type'] = type(d.pop('type'))
+        try:
+            d['value_type'] = type(d.pop('type'))
+        except KeyError:
+            raise ValueError('type is required: %s' % d)
         if 'description' not in d:
             raise ValueError('description is required: %s' % d)
         return cls(**d)
