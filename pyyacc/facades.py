@@ -3,17 +3,17 @@ Created on Jan 5, 2013
 
 @author: nino
 '''
+from ConfigParser import RawConfigParser
 
 class ConfigParserFacade(object):
     """Provides a duck-type interface to a read-only ConfigParser object."""
-    def __init__(self, descriptor, params):
-        self._descriptor = descriptor
+    def __init__(self, params):
         self._params = params
         
-    def get(self, section, name, type=None): #@ReservedAssignment
+    def get(self, section, name, type_=None): #@ReservedAssignment
         v = self._params[section][name]
-        if type:
-            assert isinstance(v, type)
+        if type_:
+            assert isinstance(v, type_), (type(v), type_)
         return v
         
     def getboolean(self, section, name):
@@ -24,6 +24,14 @@ class ConfigParserFacade(object):
     
     def getfloat(self, section, name):
         return self.get(section, name, float)
+    
+    def getdict(self, section, name):
+        """Extension"""
+        return self.get(section, name, dict)
+    
+    def getlist(self, section, name):
+        """Extension"""
+        return self.get(section, name, (list, tuple))
     
     def has_section(self, section):
         return section in self._params
@@ -39,4 +47,22 @@ class ConfigParserFacade(object):
     
     def sections(self):
         return self._params.keys()
+    
+    def to_dict(self):
+        return self._params
 
+if __name__ == '__main__':
+    import sys
+    from pyyacc.parser import parse
+    from pyyacc.parser import ConfigurationBuilder
+    
+    descriptor = parse(open(sys.argv[1]))
+    yamls = [parse(open(f)) for f in sys.argv[2:]]
+    b = ConfigurationBuilder(descriptor)
+    params = b.build(*yamls)
+    cfg = RawConfigParser()
+    for section in params.keys():
+        cfg.add_section(section)
+        for key, value in params[section].iteritems():
+            cfg.set(section, key, value)
+    cfg.write(sys.stdout)
