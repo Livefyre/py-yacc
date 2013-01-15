@@ -134,7 +134,7 @@ class TestConfigParserFacade(BaseTest):
         v = parse(self.open("spec.yaml"))
         assert isinstance(v, ConfigurationDescriptor)
         c = ConfigurationBuilder(v).build()
-        f = ConfigParserFacade(v, c)
+        f = ConfigParserFacade(c)
         
         def compare(method, section, key, type_):
             assert f.has_section(section)
