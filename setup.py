@@ -11,7 +11,7 @@ setup(
     description = ("A YAML based configuration DSL and associated parser/validator."),
     url="https://github.com/Livefyre/py-yacc",
     license = "BSD",
-    packages=['pyyacc'],
+    packages=['pyyacc', 'pyyacc.scripts'],
     long_description=open('README.md').read(),
     install_requires=['PyYAML>=3.10',],
     setup_requires=['nose>=1.0', 'coverage', 'nosexcover'],
