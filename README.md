@@ -50,11 +50,11 @@ Example
           some: thing
           more: than
           a: scalar
-    i_am_a_list: !spec
+      i_am_a_list: !spec
         description: What I am used for
         type: []
         value: [ a, b, c]
-    i_am_a_uri: !spec
+      i_am_a_uri: !spec
         description: What I am used for
         type: !uri
         value: !uri "http://www.google.com"
