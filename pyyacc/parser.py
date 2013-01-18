@@ -72,7 +72,6 @@ class ConfigurationBuilder(object):
                 if not isinstance(value, setting.obj_type):
                     errors[(section, key)] = TypeError("expected %s, got %s (from %s)" % (setting.obj_type, type(value), value))
         return errors
-
     
 def parse(fd):
     """Parse the provided YAML. Assuming this is a well-formed map at the root, it returns a `ConfigurationDescriptor`."""
