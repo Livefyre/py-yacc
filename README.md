@@ -74,5 +74,5 @@ Using with buildout
     recipe = collective.recipe.template
     output = to_a_file
     input = inline:
-    Use me: ${read-params:config-i_am_a_section-i_am_a_setting}
-    Use me too: ${read-params:config-i_am_a_section-i_am_a_list}
+      Use me: ${read-params:config-i_am_a_section-i_am_a_setting}
+      Use me too: ${read-params:config-i_am_a_section-i_am_a_list}
