@@ -20,7 +20,8 @@ setup(
         "License :: OSI Approved :: BSD License",
     ],
     entry_points={
-      'console_scripts': ['pyyacc.validate = pyyacc.scripts.compile:validate_main',
-                          'pyyacc.sources = pyyacc.scripts.compile:sources_main',]
+                  'console_scripts': ['pyyacc.validate = pyyacc.scripts.compile:validate_main',
+                                      'pyyacc.sources = pyyacc.scripts.compile:sources_main',],
+                  'zc.buildout': ['parse = pyyacc.buildout:ParseYAML']
     }
 )
