@@ -16,6 +16,9 @@ def validate_main():
     parser.add_option("-i", "--ignore_requirements", dest="ignored",
                       default=None,
                       help="requirements to ignore for validation purposes.")
+    parser.add_option("-f", "--format", dest="format",
+                      default="yaml",
+                      help="requirements to ignore for validation purposes.")
 
     (options, yamls) = parser.parse_args()
     if not yamls:
@@ -31,8 +34,19 @@ def validate_main():
         sys.exit(1)
         return
     
-    unparse(sys.stdout, dict(params.iteritems()), default_flow_style=False)
+    if options.format == 'yaml':
+        unparse(sys.stdout, dict(params.iteritems()), default_flow_style=False)
+    elif options.format == 'sh':
+        for section in params:
+            for key, value in params[section].iteritems():
+                print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))  
+    else:
+        print >> sys.stderr, "Invalid output format."
+        sys.exit(2)
     sys.exit(0)
+    
+def _norm_sh_key(k):
+    return k.upper().replace("-", "_")
 
 def sources_main():
     usage = "usage: %prog [options] yaml [yaml ...]"

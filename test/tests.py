@@ -36,10 +36,12 @@ class TestParser(BaseTest):
     def test_parse_requirement(self):
         x = parse(self.fd("""!required "abc" """))
         assert isinstance(x, Requirement)
+        repr(x)
         
     def test_parse_optional(self):
         x = parse(self.fd("""!optional "abc" """))
         assert isinstance(x, Optional)
+        repr(x)
 
     def test_parse_uri(self):
         x = parse(self.fd("""!URI "smtp://host:25/" """))
@@ -47,6 +49,7 @@ class TestParser(BaseTest):
         assert x.hostname == "host"
         assert x.port == 25
         assert x.scheme == "smtp"
+        assert str(x) == "smtp://host:25/"
         
     def test_parse_spec(self):
         x = parse(self.fd("""!spec\ntype: !!int "0"\ndescription:\nvalue: 1"""))
@@ -59,6 +62,7 @@ class TestParser(BaseTest):
         
         x = parse(self.fd("""!spec\ntype: !!int "0"\ndescription:\nvalue: 1\ndeprecated: true"""))
         assert x.deprecated
+        repr(x)
 
 
 class TestBuilder(BaseTest):
@@ -128,6 +132,19 @@ class TestBuilder(BaseTest):
         assert errors
         assert ('section', 'param') in errors
         assert isinstance(errors[('section', 'param')], TypeError)
+
+    def xtest_validator_type_list(self):
+        x = parse(self.fd("""!spec\ntype: [ !!int "0", !!null ]\ndescription:\nvalue: !required\n"""))
+        y = parse(self.fd("""section:\n param: !!null"""))
+        b = ConfigurationBuilder(dict(section=dict(param=x)))
+        params = b.build(y)
+        assert params['section']['param'] == None
+
+        errors = b.validate(params)
+        assert not errors
+        #assert ('section', 'param') in errors
+        #assert isinstance(errors[('section', 'param')], TypeError)
+
 
 class TestConfigParserFacade(BaseTest):
     def test1(self):

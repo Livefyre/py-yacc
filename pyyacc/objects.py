@@ -3,6 +3,7 @@ Created on Jan 4, 2013
 
 @author: nino
 '''
+import urlparse
 
 class ConfigurationDescriptor(dict): 
     pass
@@ -53,3 +54,12 @@ class Optional(object):
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls()
+
+class ParseResult(urlparse.ParseResult):
+    def __str__(self):
+        return self.geturl()
+
+def to_uri(v):
+    p = urlparse.urlparse(v)
+    p.__class__ = ParseResult
+    return p

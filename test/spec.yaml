@@ -32,11 +32,15 @@ tests:
  bool: !spec
    type: !!bool "true"
    value: false
-   description:    
+   description:   
  float: !spec
    type: !!float "0.0"
    value: 100.1
    description:    
+ list: !spec
+   type: [1]
+   value: [1]
+   description: A list    
  
 uris:
  www: !spec
