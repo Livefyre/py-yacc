@@ -40,7 +40,7 @@ def validate_main():
         for section in params:
             for key, value in params[section].iteritems():
                 if value is None:
-                    print "# %s__%s is unset" % _norm_sh_key(section), _norm_sh_key(key)
+                    print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
                 else:
                     print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))  
     else:
