@@ -39,7 +39,10 @@ def validate_main():
     elif options.format == 'sh':
         for section in params:
             for key, value in params[section].iteritems():
-                print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))  
+                if value is None:
+                    print "# %s__%s is unset" % _norm_sh_key(section), _norm_sh_key(key)
+                else:
+                    print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))  
     else:
         print >> sys.stderr, "Invalid output format."
         sys.exit(2)
