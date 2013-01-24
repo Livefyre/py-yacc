@@ -38,9 +38,13 @@ tests:
    value: 100.1
    description:    
  list: !spec
-   type: [1]
+   type: []
    value: [1]
-   description: A list    
+   description: A list
+ optlist: !spec
+   type: [ [], !!null ]
+   value: !!null
+   description: Something that can be either a list or null    
  
 uris:
  www: !spec

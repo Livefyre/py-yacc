@@ -133,7 +133,7 @@ class TestBuilder(BaseTest):
         assert ('section', 'param') in errors
         assert isinstance(errors[('section', 'param')], TypeError)
 
-    def xtest_validator_type_list(self):
+    def test_validator_type_list(self):
         x = parse(self.fd("""!spec\ntype: [ !!int "0", !!null ]\ndescription:\nvalue: !required\n"""))
         y = parse(self.fd("""section:\n param: !!null"""))
         b = ConfigurationBuilder(dict(section=dict(param=x)))
@@ -165,4 +165,11 @@ class TestConfigParserFacade(BaseTest):
         compare(f.getint, "tests", "int", int)
         compare(f.getboolean, "tests", "bool", bool)
         compare(f.getfloat, "tests", "float", float)
+        compare(f.getlist, "tests", "list", list)
+        
+        assert f.getlist('tests', 'list') == [1]
+        assert v['tests']['list'].obj_type == list
+        assert v['tests']['optlist'].obj_type == (list, type(None))
+        assert v['tests']['optlist'].value == None
+        
         
