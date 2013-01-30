@@ -10,7 +10,7 @@ from yaml.scanner import ScannerError
 from nose.tools import assert_raises
 import StringIO
 from pyyacc.objects import Requirement, Optional, ValueSpec,\
-    ConfigurationDescriptor, ConfigSet
+    ConfigurationDescriptor, ConfigSet, URL
 from urlparse import ParseResult
 from pyyacc.facades import ConfigParserFacade
 
@@ -44,12 +44,13 @@ class TestParser(BaseTest):
         repr(x)
 
     def test_parse_uri(self):
-        x = parse(self.fd("""!URI "smtp://host:25/" """))
-        assert isinstance(x, ParseResult)
+        x = parse(self.fd("""!url "smtp://host:25/" """))
+        assert isinstance(x, URL), type(x)
+        assert str(x) == "smtp://host:25/"
+        x = x.parse()
         assert x.hostname == "host"
         assert x.port == 25
         assert x.scheme == "smtp"
-        assert str(x) == "smtp://host:25/"
         
     def test_parse_spec(self):
         x = parse(self.fd("""!spec\ntype: !!int "0"\ndescription:\nvalue: 1"""))

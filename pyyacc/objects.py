@@ -59,11 +59,22 @@ class Optional(object):
     def _yaml_constructor(cls, loader, node):
         return cls()
 
-class ParseResult(urlparse.ParseResult):
-    def __str__(self):
-        return self.geturl()
 
-def to_uri(v):
-    p = urlparse.urlparse(v)
-    p.__class__ = ParseResult
+class URL(unicode):
+    def parse(self):
+        return urlparse.urlparse(self)
+    
+    def validate(self):
+        """We don't want to be too strict here, as this could include file:///... mongo connection strings etc."""
+        p = self.parse()
+        if not p.scheme:
+            raise ValueError("Unparseable URL: %s" % self)
+
+# Deprecated:
+ParseResult = URL
+
+def to_url(v):
+    p = URL(v)
+    if p:
+        p.validate()
     return p
