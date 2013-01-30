@@ -9,6 +9,7 @@ from collections import defaultdict, OrderedDict
 from pyyacc.parser import parse, ConfigurationBuilder, unparse, build
 from optparse import OptionParser
 import os
+import pickle
 
 def validate_main():
     usage = "usage: %prog [options] yaml [yaml ...]"
@@ -36,6 +37,8 @@ def validate_main():
     
     if options.format == 'yaml':
         unparse(sys.stdout, dict(params.iteritems()), default_flow_style=False)
+    elif options.format == 'pickle':
+        pickle.dump(dict(params), sys.stdout)
     elif options.format == 'sh':
         for section in params:
             for key, value in params[section].iteritems():
