@@ -6,10 +6,13 @@ Created on Jan 6, 2013
 
 import sys
 from collections import defaultdict, OrderedDict
-from pyyacc.parser import parse, ConfigurationBuilder, unparse, build
+from pyyacc.parser import parse, unparse, build
 from optparse import OptionParser
 import os
 import pickle
+import json
+from pyyacc.objects import ParseResult
+
 
 def validate_main():
     usage = "usage: %prog [options] yaml [yaml ...]"
@@ -39,6 +42,12 @@ def validate_main():
         unparse(sys.stdout, dict(params.iteritems()), default_flow_style=False)
     elif options.format == 'pickle':
         pickle.dump(dict(params), sys.stdout)
+    elif options.format == 'json':
+        json.dump(dict(params), 
+                  sys.stdout, 
+                  sort_keys=True, 
+                  indent=2, 
+                  separators=(',', ': '))
     elif options.format == 'sh':
         for section in params:
             for key, value in params[section].iteritems():

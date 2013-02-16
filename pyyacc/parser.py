@@ -17,7 +17,7 @@ except ImportError:
     from yaml import Loader, Dumper
     
 from pyyacc.objects import ValueSpec, Requirement, Optional,\
-    ConfigurationDescriptor, ConfigSet, to_uri, ParseResult
+    ConfigurationDescriptor, ConfigSet, to_url, ParseResult
 from logging import getLogger
 
 LOG = getLogger(__file__)
@@ -25,9 +25,11 @@ LOG = getLogger(__file__)
 Loader.add_constructor("!spec", ValueSpec._yaml_constructor)
 Loader.add_constructor("!required", Requirement._yaml_constructor)
 Loader.add_constructor("!optional", Optional._yaml_constructor)
-Loader.add_constructor("!URI", lambda loader, node: to_uri(loader.construct_scalar(node)))
-Loader.add_constructor("!uri", lambda loader, node: to_uri(loader.construct_scalar(node)))
-Dumper.add_representer(ParseResult, lambda dumper, data: dumper.represent_scalar("!uri", data.geturl()))
+Loader.add_constructor("!URI", lambda loader, node: to_url(loader.construct_scalar(node)))
+Loader.add_constructor("!uri", lambda loader, node: to_url(loader.construct_scalar(node)))
+Loader.add_constructor("!url", lambda loader, node: to_url(loader.construct_scalar(node)))
+# this gets a little funky.
+#Dumper.add_representer(ParseResult, lambda dumper, data: dumper.represent_scalar("!uri", data.geturl()))
         
 
 class ConfigurationBuilder(object):
