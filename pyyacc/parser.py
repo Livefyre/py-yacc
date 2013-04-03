@@ -95,7 +95,7 @@ def build(*yamls):
     desc = yamls[0]
     descriptor = parse(open(desc))
     builder = ConfigurationBuilder(descriptor)
-    params = builder.build(*[parse(open(f)) for f in yamls[1:]])
+    params = builder.build(*filter(bool, [parse(open(f)) for f in yamls[1:]]))
     return builder, params
 
 
