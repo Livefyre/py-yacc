@@ -55,6 +55,7 @@ def validate_main():
                     print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
                 else:
                     print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))  
+                    print "export %s__%s\n" % (_norm_sh_key(section), _norm_sh_key(key))
     else:
         print >> sys.stderr, "Invalid output format."
         sys.exit(2)
