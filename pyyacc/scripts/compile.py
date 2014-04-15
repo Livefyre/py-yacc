@@ -37,16 +37,16 @@ def validate_main():
         unparse(sys.stderr, dict(d), default_flow_style=False)
         sys.exit(1)
         return
-    
+
     if options.format == 'yaml':
         unparse(sys.stdout, dict(params.iteritems()), default_flow_style=False)
     elif options.format == 'pickle':
         pickle.dump(dict(params), sys.stdout)
     elif options.format == 'json':
-        json.dump(dict(params), 
-                  sys.stdout, 
-                  sort_keys=True, 
-                  indent=2, 
+        json.dump(dict(params),
+                  sys.stdout,
+                  sort_keys=True,
+                  indent=2,
                   separators=(',', ': '))
     elif options.format == 'sh':
         for section in params:
@@ -59,7 +59,7 @@ def validate_main():
         print >> sys.stderr, "Invalid output format."
         sys.exit(2)
     sys.exit(0)
-    
+
 def _norm_sh_key(k):
     return k.upper().replace("-", "_")
 
@@ -84,4 +84,4 @@ def sources_main():
                 if key in yam_d.get(section, {}):
                     params[section][key] = os.path.basename(yam)
     unparse(sys.stdout, dict(params), default_flow_style=False)
-    
+
