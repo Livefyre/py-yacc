@@ -10,13 +10,13 @@ Created on Jan 2, 2013
 @author: nino
 '''
 
-from yaml import load, dump
+from yaml import load as _load, dump as _dump
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
-    
-from pyyacc.objects import ValueSpec, Requirement, Optional,\
+
+from pyyacc.objects import ValueSpec, Requirement, Optional, \
     ConfigurationDescriptor, ConfigSet, to_url, ParseResult
 from logging import getLogger
 
@@ -29,13 +29,13 @@ Loader.add_constructor("!URI", lambda loader, node: to_url(loader.construct_scal
 Loader.add_constructor("!uri", lambda loader, node: to_url(loader.construct_scalar(node)))
 Loader.add_constructor("!url", lambda loader, node: to_url(loader.construct_scalar(node)))
 # this gets a little funky.
-#Dumper.add_representer(ParseResult, lambda dumper, data: dumper.represent_scalar("!uri", data.geturl()))
-        
+# Dumper.add_representer(ParseResult, lambda dumper, data: dumper.represent_scalar("!uri", data.geturl()))
+
 
 class ConfigurationBuilder(object):
     def __init__(self, descriptor):
         self.descriptor = descriptor
-        
+
     def build(self, *overlays):
         params = ConfigSet()
         for section in self.descriptor.keys():
@@ -54,7 +54,7 @@ class ConfigurationBuilder(object):
                     continue
                 params[section][key] = value
         return params
-    
+
     def validate(self, params, ignored=[]):
         errors = {}
         for section in self.descriptor.keys():
@@ -74,10 +74,19 @@ class ConfigurationBuilder(object):
                 if not isinstance(value, setting.obj_type):
                     errors[(section, key)] = TypeError("expected %s, got %s (from %s)" % (setting.obj_type, type(value), value))
         return errors
-    
+
+
+def load(stream, Loader=Loader):
+    _load(stream, Loader=Loader)
+
+
+def dump(params, stream, Dumper=Dumper, **kwargs):
+    _dump(params, stream, Dumper=Dumper, **kwargs)
+
+
 def parse(fd):
     """Parse the provided YAML. Assuming this is a well-formed map at the root, it returns a `ConfigurationDescriptor`."""
-    v = load(fd, Loader)
+    v = load(fd)
     if isinstance(v, dict):
         return ConfigurationDescriptor(v)
     return v
@@ -85,7 +94,7 @@ def parse(fd):
 
 def unparse(stream, params, **kwargs):
     """Serialize the parameters to the stream as YAML."""
-    dump(params, stream, Dumper, **kwargs)
+    dump(params, stream, **kwargs)
 
 
 def build(*yamls):
