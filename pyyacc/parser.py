@@ -77,11 +77,11 @@ class ConfigurationBuilder(object):
 
 
 def load(stream, Loader=Loader):
-    _load(stream, Loader=Loader)
+    return _load(stream, Loader=Loader)
 
 
 def dump(params, stream, Dumper=Dumper, **kwargs):
-    _dump(params, stream, Dumper=Dumper, **kwargs)
+    return _dump(params, stream, Dumper=Dumper, **kwargs)
 
 
 def parse(fd):
