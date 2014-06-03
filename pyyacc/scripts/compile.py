@@ -22,7 +22,7 @@ def validate_main():
                       help="requirements to ignore for validation purposes.")
     parser.add_option("-f", "--format", dest="format",
                       default="yaml",
-                      help="requirements to ignore for validation purposes.")
+                      help="Output format: yaml, json, sh, make are supported.")
 
     (options, yamls) = parser.parse_args()
     if not yamls:
@@ -54,8 +54,15 @@ def validate_main():
                 if value is None:
                     print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
                 else:
-                    print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))  
+                    print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
                     print "export %s__%s\n" % (_norm_sh_key(section), _norm_sh_key(key))
+    elif options.format == 'make':
+        for section in params:
+            for key, value in params[section].iteritems():
+                if value is None:
+                    print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
+                else:
+                    print "define %s__%s\n%s\nendef\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
     else:
         print >> sys.stderr, "Invalid output format."
         sys.exit(2)
