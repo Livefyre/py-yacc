@@ -62,7 +62,7 @@ def validate_main():
                 if value is None:
                     print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
                 else:
-                    print "%s__%s=%s" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
+                    print "define %s__%s\n%s\nendef\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
     else:
         print >> sys.stderr, "Invalid output format."
         sys.exit(2)
