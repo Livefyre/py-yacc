@@ -12,6 +12,7 @@ import os
 import pickle
 import json
 from pyyacc.objects import ParseResult
+from safeoutput import SafeOutput
 
 
 def validate_main():
@@ -23,6 +24,8 @@ def validate_main():
     parser.add_option("-f", "--format", dest="format",
                       default="yaml",
                       help="Output format: yaml, json, sh, make are supported.")
+    parser.add_option("-o", "--output", dest="output",
+                      help="Output destination: path where to write output. If not provided, stdout is used.")
 
     (options, yamls) = parser.parse_args()
     if not yamls:
@@ -38,34 +41,35 @@ def validate_main():
         sys.exit(1)
         return
 
-    if options.format == 'yaml':
-        unparse(sys.stdout, dict(params.iteritems()), default_flow_style=False)
-    elif options.format == 'pickle':
-        pickle.dump(dict(params), sys.stdout)
-    elif options.format == 'json':
-        json.dump(dict(params),
-                  sys.stdout,
-                  sort_keys=True,
-                  indent=2,
-                  separators=(',', ': '))
-    elif options.format == 'sh':
-        for section in params:
-            for key, value in params[section].iteritems():
-                if value is None:
-                    print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
-                else:
-                    print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
-                    print "export %s__%s\n" % (_norm_sh_key(section), _norm_sh_key(key))
-    elif options.format == 'make':
-        for section in params:
-            for key, value in params[section].iteritems():
-                if value is None:
-                    print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
-                else:
-                    print "define %s__%s\n%s\nendef\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
-    else:
-        print >> sys.stderr, "Invalid output format."
-        sys.exit(2)
+    with SafeOutput(options.output) as output:
+        if options.format == 'yaml':
+            unparse(output, dict(params.iteritems()), default_flow_style=False)
+        elif options.format == 'pickle':
+            pickle.dump(dict(params), output)
+        elif options.format == 'json':
+            json.dump(dict(params),
+                      output,
+                      sort_keys=True,
+                      indent=2,
+                      separators=(',', ': '))
+        elif options.format == 'sh':
+            for section in params:
+                for key, value in params[section].iteritems():
+                    if value is None:
+                        print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
+                    else:
+                        print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
+                        print "export %s__%s\n" % (_norm_sh_key(section), _norm_sh_key(key))
+        elif options.format == 'make':
+            for section in params:
+                for key, value in params[section].iteritems():
+                    if value is None:
+                        print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
+                    else:
+                        print "define %s__%s\n%s\nendef\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
+        else:
+            print >> sys.stderr, "Invalid output format."
+            sys.exit(2)
     sys.exit(0)
 
 def _norm_sh_key(k):
