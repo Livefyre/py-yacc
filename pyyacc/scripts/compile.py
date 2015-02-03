@@ -13,6 +13,7 @@ import pickle
 import json
 from pyyacc.objects import ParseResult
 from safeoutput import SafeOutputFile
+from tempfile import NamedTemporaryFile
 import hashlib
 
 
@@ -27,14 +28,14 @@ def validate_main():
                       help="Output format: yaml, json, sh, make are supported.")
     parser.add_option("-o", "--output", dest="output",
                       help="Output destination: path where to write output. If not provided, stdout is used.")
-    parser.add_option("-t", "--test", action='store_true',
-                      help="Tests to see if the contents in --output don't match whats specified by the yamls. Requires --output.")
+    parser.add_option("-t", "--test", dest="test",
+                      help="Tests to see if the contents in the file match whats specified by the yamls.")
 
     (options, yamls) = parser.parse_args()
     if not yamls:
         parser.print_usage()
         exit(-1)
-    if options.test and not options.output:
+    if options.test and options.output:
         parser.print_usage()
         exit(-1)
 
@@ -80,7 +81,9 @@ def validate_main():
         if options.test:
           output.flush()
           same = _check_same(options.output, output.name)
-          if not same:
+          if same:
+            output.close(False)
+          else:
             print >> sys.stderr, "Config mismatch!"
             sys.exit(3)
 
