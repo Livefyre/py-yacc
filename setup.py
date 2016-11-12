@@ -13,7 +13,7 @@ setup(
     license = "BSD",
     packages=find_packages(exclude=('test',)),
     long_description=open('README.md').read(),
-    install_requires=['PyYAML>=3.10',],
+    install_requires=['PyYAML>=3.10', 'zc.buildout',],
     setup_requires=['nose>=1.0', 'coverage', 'nosexcover'],
     test_suite = 'nose.collector',
     classifiers=[
