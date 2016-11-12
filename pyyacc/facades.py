@@ -40,7 +40,7 @@ class ConfigParserFacade(object):
         return name in self._params[section]
 
     def options(self, section):
-        return self._params[section].keys() 
+        return self._params[section].keys()
 
     def items(self, section):
         return self._params[section].items()
@@ -50,6 +50,10 @@ class ConfigParserFacade(object):
 
     def to_dict(self):
         return self._params
+
+    def set(self, section, key, value):
+        sect = self._params.setdefault(section, {})
+        sect[key] = value
 
 if __name__ == '__main__':
     import sys
