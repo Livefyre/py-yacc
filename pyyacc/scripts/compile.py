@@ -12,7 +12,7 @@ import os
 import pickle
 import json
 from pyyacc.objects import ParseResult
-from safeoutput import SafeOutputFile
+from safeoutput import open as safeopen
 from tempfile import NamedTemporaryFile
 import hashlib
 
@@ -49,7 +49,12 @@ def validate_main():
         sys.exit(1)
         return
 
-    with SafeOutputFile(options.output) as output:
+    if options.test:
+      render_fd = NamedTemporaryFile()
+    else:
+      render_fd = safeopen(options.output)
+
+    with render_fd as output:
         if options.format == 'yaml':
             unparse(output, dict(params.iteritems()), default_flow_style=False)
         elif options.format == 'pickle':
@@ -64,26 +69,26 @@ def validate_main():
             for section in params:
                 for key, value in params[section].iteritems():
                     if value is None:
-                        print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
+                        print >> output, "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
                     else:
-                        print "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
-                        print "export %s__%s\n" % (_norm_sh_key(section), _norm_sh_key(key))
+                        print >> output, "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
+                        print >> output, "export %s__%s\n" % (_norm_sh_key(section), _norm_sh_key(key))
         elif options.format == 'make':
             for section in params:
                 for key, value in params[section].iteritems():
                     if value is None:
-                        print "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
+                        print >> output, "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
                     else:
-                        print "define %s__%s\n%s\nendef\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
+                        print >> output, "define %s__%s\n%s\nendef\n" % (_norm_sh_key(section), _norm_sh_key(key), str(value))
         else:
             print >> sys.stderr, "Invalid output format."
             sys.exit(2)
+
+
         if options.test:
           output.flush()
-          same = _check_same(options.output, output.name)
-          if same:
-            output.close(False)
-          else:
+          same = _check_same(options.test, output.name)
+          if not same:
             print >> sys.stderr, "Config mismatch!"
             sys.exit(3)
 
@@ -91,7 +96,7 @@ def _norm_sh_key(k):
     return k.upper().replace("-", "_")
 
 def _check_same(x, y):
-    with open(x, 'rb') as xfd:
+    with open(x, 'r') as xfd:
         xcontent = xfd.read()
         xhash = hashlib.md5(xcontent).hexdigest()
     with open(y, 'r') as yfd:
