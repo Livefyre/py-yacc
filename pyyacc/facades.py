@@ -10,7 +10,7 @@ class ConfigParserFacade(object):
     def __init__(self, params):
         self._params = params
 
-    def get(self, section, name, type_=None): # @ReservedAssignment
+    def get(self, section, name, type_=None): #@ReservedAssignment
         v = self._params[section][name]
         if type_:
             assert isinstance(v, type_), (type(v), type_)
