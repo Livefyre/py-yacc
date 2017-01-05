@@ -13,7 +13,7 @@ setup(
     license = "BSD",
     packages=find_packages(exclude=('test',)),
     long_description=open('README.md').read(),
-    install_requires=['PyYAML>=3.10', 'zc.buildout', 'safeoutput',],
+    install_requires=['PyYAML>=3.10', 'safeoutput',],
     setup_requires=['nose>=1.0', 'coverage', 'nosexcover'],
     test_suite = 'nose.collector',
     classifiers=[
@@ -21,7 +21,6 @@ setup(
     ],
     entry_points={
                   'console_scripts': ['pyyacc.validate = pyyacc.scripts.compile:validate_main',
-                                      'pyyacc.sources = pyyacc.scripts.compile:sources_main',],
-                  'zc.buildout': ['parse = pyyacc.buildout:ParseYAML']
+                                      'pyyacc.sources = pyyacc.scripts.compile:sources_main',]
     }
 )
