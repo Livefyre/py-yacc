@@ -5,3 +5,9 @@
 .pydevproject
 *.egg-info
 build
+/env
+/.eggs
+/cover
+/coverage.xml
+/nosetests.xml
+.coverage

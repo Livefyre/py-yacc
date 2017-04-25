@@ -4,11 +4,6 @@ email:
    description: The 'from' address in emails sent from.
    value: notify@example.com
 
- username: !spec
-   type: !!str ""
-   description: Username for connecting to an SMTP gateway. Required only for SMTPBackend.
-   value: !optional
-
  backend: !spec
    type: !!str ""
    description: Django email backend. Usually per environment, depending on where 
@@ -48,23 +43,23 @@ tests:
  
 uris:
  www: !spec
-   type: !URI
-   value: !URI http://www.google.com
+   type: !uri
+   value: !uri http://www.google.com
    description: 
 
  smtp: !spec
-   type: !URI
-   value: !URI smtp://example.com:25/
+   type: !uri
+   value: !uri smtp://example.com:25/
    description:
    
  mongo: !spec
-   type: !URI
-   value: !URI mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
+   type: !uri
+   value: !uri mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
    description: 
    
  mongo-sock: !spec 
-   type: !URI
-   value: !URI mongodb:///tmp/mongodb-27017.sock
+   type: !uri
+   value: !uri mongodb:///tmp/mongodb-27017.sock
    description: 
 
  
@@ -77,7 +72,7 @@ misconfiguration_examples:
 # !host: required to be a resolvable address
 mqueue:
   redis_host: !spec
-    type: !URI "redis:"
+    type: !uri "redis:"
     value: !required "from cluster"
     description: foo
     
