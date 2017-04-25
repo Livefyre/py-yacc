@@ -1,12 +1,15 @@
 import urlparse
 from pyyacc.yml import register
 from logging import getLogger
+from pyyacc.uritools import DataURI
+from pyyacc.cstore import CredentialStore, CREDENTIAL_MIMETYPE
 
-LOG = getLogger(__file__)
+LOG = getLogger(__name__)
 
 
 class ConfigRoot(dict):
     """A root document. Not exactly a yaml node, but the root."""
+
     def validate(self, params):
         """
         Identify any errors in the aggregated configuration.
@@ -52,7 +55,7 @@ class ValueSpec(object):
         if 'description' not in d:
             raise ValueError('description is required: %s' % d)
         return cls(**d)
-    
+
     def coerce(self, input_):
         if getattr(self.type, 'pyyacc_coerce', None) and not getattr(input_, '_pyyacc_no_coerce', False):
             input_ = self.type.pyyacc_coerce(input_)
@@ -67,9 +70,11 @@ class ValueSpec(object):
     def __repr__(self):
         return "ValueSpec(%s)" % (self.__dict__)
 
+
 @register("!required")
 class Requirement(object):
     _pyyacc_no_coerce = True
+
     def __init__(self, description):
         self.description = description
 
@@ -84,6 +89,7 @@ class Requirement(object):
 @register("!optional")
 class Optional(object):
     _pyyacc_no_coerce = True
+
     def __repr__(self):
         return "%s" % (self.__class__.__name__)
 
@@ -97,13 +103,13 @@ class URI(unicode):
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls.pyyacc_coerce(loader.construct_scalar(node))
-    
+
     @classmethod
     def pyyacc_coerce(cls, input_):
         p = cls(input_)
         p.validate()
         return p
-    
+
     def parse(self):
         return urlparse.urlparse(self)
 
@@ -114,3 +120,33 @@ class URI(unicode):
         p = self.parse()
         if not p.scheme:
             raise ValueError("Unparseable URL: %s" % self)
+
+
+@register("!credential")
+class Credential(DataURI):
+    @classmethod
+    def _yaml_constructor(cls, loader, node):
+        return cls.pyyacc_coerce(loader.construct_scalar(node))
+
+    @classmethod
+    def pyyacc_coerce(cls, input_):
+        if input_ is None:
+            input_ = ''
+        if not isinstance(input_, basestring):
+            raise ValueError(input_)
+        input_ = str(input_)
+
+        if input_.startswith("data:"):
+            p = cls(input_)
+        else:
+            p = cls(mimetype=CREDENTIAL_MIMETYPE,
+                    params=dict(name="", provider=""), data=input_)
+
+        resolved = CredentialStore.get(p)
+        if resolved != None:
+            if resolved.startswith("data:" + CREDENTIAL_MIMETYPE):
+                # handle the case where the value is provided back as a data URI
+                resolved = str(DataURI(resolved))
+            p = cls(mimetype=CREDENTIAL_MIMETYPE,
+                    params=p.parameters, b64=p.is_base64, data=resolved)
+        return p

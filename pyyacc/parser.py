@@ -1,11 +1,11 @@
 from logging import getLogger
 
-from pyyacc.yml import load, dump  # @UnusedImport
+from pyyacc.yml import load, dump
 from pyyacc.yml.extensions import ValueSpec, \
     Optional, ConfigRoot
 
 
-LOG = getLogger(__file__)
+LOG = getLogger(__name__)
 
 
 class ConfigBuilder(object):

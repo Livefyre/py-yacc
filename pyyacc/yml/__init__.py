@@ -5,7 +5,7 @@ except ImportError:
     from yaml import Loader as __Loader, Dumper
 from logging import getLogger
 
-LOG = getLogger(__file__)
+LOG = getLogger(__name__)
 EXTENSION_REGISTRY = {}
 
 
