@@ -76,3 +76,13 @@ mqueue:
     value: !required "from cluster"
     description: foo
     
+credentials:
+  simple: !spec
+    type: !credential
+    description: abc
+    value: !credential "data:application/vnd.pyyacc.credential,abc"
+  simple_b64: !spec
+    type: !credential
+    description: abc
+    value: !credential "data:application/vnd.pyyacc.credential,YWJj"
+    
