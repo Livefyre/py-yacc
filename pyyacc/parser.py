@@ -62,8 +62,11 @@ class ConfigBuilder(object):
             if isinstance(fn, dict):
                 return ConfigRoot(fn)
             if isinstance(fn, basestring):
+                LOG.debug("loading %s", fn)
                 fn = open(fn)
             v = load(fn)
+            if v is None:
+                v = {}
             return ConfigRoot(v)
 
         roots = map(parse, files)
