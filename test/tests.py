@@ -127,6 +127,22 @@ class TestBuilder(BaseTest):
         assert ('section', 'param') in errors
         assert isinstance(errors[('section', 'param')], Requirement)
 
+    def test_empty_fle(self):
+        spec1 = fd("""
+    section:
+      param: !spec
+        type: !!int "0"
+        description:
+        value: !required
+        """)
+        over = fd("""
+        """)
+        _builder, params = ConfigBuilder.parse(spec1, over)
+        errors = _builder.validate(params)
+        # should be normal errors
+        assert ('section', 'param') in errors
+        assert isinstance(errors[('section', 'param')], Requirement)
+
     def test_validator_type_error(self):
         spec1 = fd("""
     section: 
