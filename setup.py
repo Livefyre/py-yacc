@@ -12,15 +12,15 @@ setup(
     license="BSD",
     packages=find_packages(exclude=('test',)),
     long_description=open('README.md').read(),
-    install_requires=['PyYAML>=3.10', 'safeoutput', ],
-    tests_requires=['nose>=1.0', 'coverage', 'nosexcover'],
-    test_suite='nose.collector',
+    long_description_content_type='text/markdown',
+    install_requires=['PyYAML>=3.12', 'safeoutput'],
     classifiers=[
         "License :: OSI Approved :: BSD License",
     ],
     entry_points={
         'console_scripts': ['pyyacc.validate = pyyacc.scripts.compile:validate_main', # deprecated
-                            'pyyacc = pyyacc.scripts.compile:validate_main']
+                            'pyyacc = pyyacc.scripts.compile:validate_main',
+                            'pyyacc3 = pyyacc3.compile:main']
     },
-    extras_require={'test': ['nose>=1.0', 'coverage', 'nosexcover']}
+    extras_require={'test': ['mock', 'nose>=1.0', 'coverage', 'nosexcover']}
 )

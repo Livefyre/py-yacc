@@ -11,3 +11,4 @@ build
 /coverage.xml
 /nosetests.xml
 .coverage
+/dist

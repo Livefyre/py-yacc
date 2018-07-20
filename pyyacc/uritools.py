@@ -28,7 +28,7 @@ class DataURI(str):
         uri.parameters = params or {}
         uri.is_base64 = b64
         return uri
-    
+
     @classmethod
     def _parse(cls, value):
         match = _DATA_URI_RE.match(value)
@@ -40,14 +40,14 @@ class DataURI(str):
             def _param(p):
                 n, v = p.split("=", 1)
                 return n, urllib.unquote(v)
-            
+
             params = dict((_param(x) for x in filter(None, params.split(";"))))
         if match.group('base64'):
             data = match.group('data').decode('base64')
         else:
             data = urllib.unquote(match.group('data'))
         return mimetype, params, bool(match.group('base64')), data
-    
+
     def fullstring(self):
         val = ["data:"]
         if self.mimetype:

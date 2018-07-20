@@ -1,0 +1,7 @@
+# for demonstration, etc.
+jupyter
+bash_kernel
+# for release
+setuptools>=38.6.0 
+twine>=1.11.0
+wheel>=0.31.0

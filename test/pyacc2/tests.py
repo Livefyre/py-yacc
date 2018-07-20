@@ -24,7 +24,7 @@ class TestBuilder(BaseTest):
 
     def test_build_1(self):
         spec1 = fd("""
-    section: 
+    section:
       param: !spec
         type: !!int "0"
         description:
@@ -37,13 +37,13 @@ class TestBuilder(BaseTest):
 
     def test_build_2(self):
         spec1 = fd("""
-    section: 
+    section:
       param: !spec
         type: !!int "0"
         description:
         value: 1
 
-    section2: 
+    section2:
       param: !spec
         type: !!int "0"
         description:
@@ -55,7 +55,7 @@ class TestBuilder(BaseTest):
 
     def test_overlay_1(self):
         spec1 = fd("""
-    section: 
+    section:
       param: !spec
         type: !!int "0"
         description:
@@ -75,7 +75,7 @@ class TestBuilder(BaseTest):
 
     def test_overlay_2(self):
         spec1 = fd("""
-    section: 
+    section:
       param: !spec
         type: !!int "0"
         description:
@@ -94,7 +94,7 @@ class TestBuilder(BaseTest):
 
     def test_validator_no_errors(self):
         spec1 = fd("""
-    section: 
+    section:
       param: !spec
         type: !!int "0"
         description:
@@ -112,7 +112,7 @@ class TestBuilder(BaseTest):
 
     def test_validator_required(self):
         spec1 = fd("""
-    section: 
+    section:
       param: !spec
         type: !!int "0"
         description:
@@ -145,7 +145,7 @@ class TestBuilder(BaseTest):
 
     def test_validator_type_error(self):
         spec1 = fd("""
-    section: 
+    section:
       param: !spec
         type: !!int "0"
         description:
@@ -164,7 +164,7 @@ class TestBuilder(BaseTest):
 
     def test_validator_type_list(self):
         spec1 = fd("""
-    section: 
+    section:
       param: !spec
         type: [ !!int "0", !!null ]
         description:

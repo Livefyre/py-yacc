@@ -16,7 +16,7 @@ class TestEnvironmentResolver(unittest.TestCase):
     def test_none(self):
         self.assertEqual(EnvironmentResolver().get(cred()), None)
         self.assertEqual(EnvironmentResolver().get(cred(name="foo", provider="bar")), None)
-        
+
     def test_simple(self):
         os.environ['bar__foo'] = "meow"
         self.assertEqual(EnvironmentResolver().get(cred(name="foo", provider="bar")), "meow")

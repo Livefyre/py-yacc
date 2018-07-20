@@ -1,3 +1,0 @@
-dependencies:
-  pre:
-    - pip install .[test]

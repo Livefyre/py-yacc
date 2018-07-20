@@ -52,7 +52,7 @@ class ConfigBuilder(object):
     @classmethod
     def parse(cls, *files):
         """
-        Takes a list of config yaml files; assumes the first is the descriptor, and 
+        Takes a list of config yaml files; assumes the first is the descriptor, and
         builds up a config set.
         """
         if not files:

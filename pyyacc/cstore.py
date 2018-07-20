@@ -32,7 +32,7 @@ class EnvironmentResolver:
 
     def get(self, credential):
         """
-        
+
         :param DataURI credential:
         """
         if 'name' in credential.parameters and 'provider' in credential.parameters:
