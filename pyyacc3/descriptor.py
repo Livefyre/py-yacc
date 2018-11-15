@@ -17,6 +17,9 @@ class YaccDescriptor(defaultdict):
         assert isinstance(mapping, dict)
         super(YaccDescriptor, self).__init__(dict)
         for section in mapping:
+            if mapping[section] is None:
+                LOG.debug("%s is null.", section)
+                continue
             for key, spec in mapping[section].items():
                 if not isinstance(spec, ValueSpec):
                     LOG.debug("%s.%s is not a ValueSpec", section, key)
