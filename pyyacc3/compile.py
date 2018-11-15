@@ -183,7 +183,7 @@ class Compiler(object):
 
         with self.output_stream() as output:
             f = Formatter(self.params)
-            getattr(f, "format_%s" % self.arg_format)(output)
+            f.format_(self.arg_format, output)
 
     @contextmanager
     def output_stream(self):
@@ -210,6 +210,9 @@ class Formatter(object):
 
     def __init__(self, params):
         self.params = dict(params)
+        
+    def format_(self, format_, output):
+        getattr(self, "format_%s" % format_)(output)
 
     def format_raw(self, output):
         output.write("%s\n" % self.params)
