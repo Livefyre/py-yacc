@@ -4,16 +4,17 @@ import unittest
 from pyyacc3.yml import load
 from pyyacc3.yml.extensions import Requirement, URI, ValueSpec, Optional
 
-
 parse = load
 
 
 class TestRegistration(unittest.TestCase):
+
     def test_required(self):
         load("!required cluster.yaml")
 
 
 class TestParser(unittest.TestCase):
+
     def fd(self, string):
         return StringIO.StringIO(string)
 

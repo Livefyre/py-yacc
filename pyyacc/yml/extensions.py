@@ -32,8 +32,7 @@ class ConfigRoot(dict):
             errors[section, key] = value
             return
         if not isinstance(value, setting.obj_type):
-            errors[section, key] = TypeError(
-                "expected %s, got %s (from %s)" % (setting.obj_type, type(value), value))
+            errors[section, key] = TypeError("expected %s, got %s (from %s)" % (setting.obj_type, type(value), value))
 
 
 @register("!spec")
@@ -100,6 +99,7 @@ class Optional(object):
 
 @register("!uri")
 class URI(unicode):
+
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls.pyyacc_coerce(loader.construct_scalar(node))
@@ -124,6 +124,7 @@ class URI(unicode):
 
 @register("!credential")
 class Credential(DataURI):
+
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls.pyyacc_coerce(loader.construct_scalar(node))
@@ -139,14 +140,12 @@ class Credential(DataURI):
         if input_.startswith("data:"):
             p = cls(input_)
         else:
-            p = cls(mimetype=CREDENTIAL_MIMETYPE,
-                    params=dict(name="", provider=""), data=input_)
+            p = cls(mimetype=CREDENTIAL_MIMETYPE, params=dict(name="", provider=""), data=input_)
 
         resolved = CredentialStore.get(p)
         if resolved != None:
             if resolved.startswith("data:" + CREDENTIAL_MIMETYPE):
                 # handle the case where the value is provided back as a data URI
                 resolved = str(DataURI(resolved))
-            p = cls(mimetype=CREDENTIAL_MIMETYPE,
-                    params=p.parameters, b64=p.is_base64, data=resolved)
+            p = cls(mimetype=CREDENTIAL_MIMETYPE, params=p.parameters, b64=p.is_base64, data=resolved)
         return p

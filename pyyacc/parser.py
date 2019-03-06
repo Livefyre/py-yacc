@@ -4,7 +4,6 @@ from pyyacc.yml import load, dump
 from pyyacc.yml.extensions import ValueSpec, \
     Optional, ConfigRoot
 
-
 LOG = getLogger(__name__)
 
 

@@ -10,12 +10,15 @@ EXTENSION_REGISTRY = {}
 
 
 def register(type_, factory="_yaml_constructor"):
+
     def _wrapper(cls):
+
         def _register(loader):
             loader.add_constructor(type_, getattr(cls, factory))
 
         EXTENSION_REGISTRY[type_] = _register
         return cls
+
     return _wrapper
 
 

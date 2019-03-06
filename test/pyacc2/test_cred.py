@@ -3,16 +3,19 @@ from pyyacc.uritools import DataURI
 from pyyacc.cstore import EnvironmentResolver
 import os
 
+
 class TestBackend(unittest.TestCase):
     pass
 
+
 def cred(val='', **kwargs):
-    d = DataURI(mimetype="application/vnd.pyyacc.credential",
-                    params=kwargs, data=val)
+    d = DataURI(mimetype="application/vnd.pyyacc.credential", params=kwargs, data=val)
     #print d.fullstring(), d.parameters
     return d
 
+
 class TestEnvironmentResolver(unittest.TestCase):
+
     def test_none(self):
         self.assertEqual(EnvironmentResolver().get(cred()), None)
         self.assertEqual(EnvironmentResolver().get(cred(name="foo", provider="bar")), None)

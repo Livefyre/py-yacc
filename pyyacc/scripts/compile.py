@@ -12,13 +12,18 @@ import hashlib
 def validate_main():
     usage = "usage: %prog [options] yaml [yaml ...]"
     parser = OptionParser(usage=usage)
-    parser.add_option("-f", "--format", dest="format",
-                      default="yaml",
-                      help="Output format: yaml, json, sh, make are supported.")
-    parser.add_option("-o", "--output", dest="output",
-                      help="Output destination: path where to write output. If not provided, stdout is used.")
-    parser.add_option("-t", "--test", dest="test",
-                      help="Tests to see if the contents in the file match whats specified by the yamls.")
+    parser.add_option(
+        "-f", "--format", dest="format", default="yaml", help="Output format: yaml, json, sh, make are supported.")
+    parser.add_option(
+        "-o",
+        "--output",
+        dest="output",
+        help="Output destination: path where to write output. If not provided, stdout is used.")
+    parser.add_option(
+        "-t",
+        "--test",
+        dest="test",
+        help="Tests to see if the contents in the file match whats specified by the yamls.")
 
     (options, yamls) = parser.parse_args()
     if not yamls:
@@ -49,31 +54,24 @@ def validate_main():
         elif options.format == 'pickle':
             pickle.dump(dict(params), output)
         elif options.format == 'json':
-            json.dump(dict(params),
-                      output,
-                      sort_keys=True,
-                      indent=2,
-                      separators=(',', ': '))
+            json.dump(dict(params), output, sort_keys=True, indent=2, separators=(',', ': '))
         elif options.format == 'sh':
             for section in params:
                 for key, value in params[section].iteritems():
                     if value is None:
-                        print >> output, "# %s__%s is unset" % (
-                            _norm_sh_key(section), _norm_sh_key(key))
+                        print >> output, "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
                     else:
-                        print >> output, "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (
-                            _norm_sh_key(section), _norm_sh_key(key), str(value))
-                        print >> output, "export %s__%s\n" % (
-                            _norm_sh_key(section), _norm_sh_key(key))
+                        print >> output, "read -r -d '' %s__%s<<EOF\n%s\nEOF\n" % (_norm_sh_key(section),
+                                                                                   _norm_sh_key(key), str(value))
+                        print >> output, "export %s__%s\n" % (_norm_sh_key(section), _norm_sh_key(key))
         elif options.format == 'make':
             for section in params:
                 for key, value in params[section].iteritems():
                     if value is None:
-                        print >> output, "# %s__%s is unset" % (
-                            _norm_sh_key(section), _norm_sh_key(key))
+                        print >> output, "# %s__%s is unset" % (_norm_sh_key(section), _norm_sh_key(key))
                     else:
-                        print >> output, "define %s__%s\n%s\nendef\n" % (
-                            _norm_sh_key(section), _norm_sh_key(key), str(value))
+                        print >> output, "define %s__%s\n%s\nendef\n" % (_norm_sh_key(section), _norm_sh_key(key),
+                                                                         str(value))
         else:
             print >> sys.stderr, "Invalid output format."
             sys.exit(2)

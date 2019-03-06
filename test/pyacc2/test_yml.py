@@ -7,16 +7,17 @@ from pyyacc.yml.extensions import Requirement, URI, ValueSpec, Optional,\
     Credential
 import os
 
-
 parse = load
 
 
 class TestRegistration(unittest.TestCase):
+
     def test_required(self):
         load("!required cluster.yaml")
 
 
 class TestParser(unittest.TestCase):
+
     def fd(self, string):
         return StringIO.StringIO(string)
 
@@ -53,8 +54,8 @@ class TestParser(unittest.TestCase):
         self.assertEqual(x.parameters, dict(name="123"))
 
     def test_parse_uri_cred_params(self):
-        x = parse(self.fd(
-            """!credential "data:application/vnd.pyyacc.credential;name=123%3D;other=XXX;base64,YWJj" """))
+        x = parse(
+            self.fd("""!credential "data:application/vnd.pyyacc.credential;name=123%3D;other=XXX;base64,YWJj" """))
         assert isinstance(x, Credential)
         self.assertEqual(x, "abc")
         self.assertEqual(x.fullstring(), 'data:application/vnd.pyyacc.credential;name=123%3D;other=XXX;base64,YWJj')
@@ -63,8 +64,7 @@ class TestParser(unittest.TestCase):
     def test_parse_cred_env_resolver(self):
         os.environ['Unit_Test__key'] = 'meow'
         CredentialStore.add_resolver(EnvironmentResolver())
-        x = parse(self.fd(
-            """!credential "data:application/vnd.pyyacc.credential;provider=Unit%20Test;name=key," """))
+        x = parse(self.fd("""!credential "data:application/vnd.pyyacc.credential;provider=Unit%20Test;name=key," """))
         assert isinstance(x, Credential)
         self.assertEqual(x.fullstring(), 'data:application/vnd.pyyacc.credential;name=key;provider=Unit%20Test,meow')
         self.assertEqual(os.environ['Unit_Test__key'], "meow")
@@ -73,8 +73,7 @@ class TestParser(unittest.TestCase):
     def test_parse_cred_env_resolver_data_uri(self):
         os.environ['Unit_Test__key'] = 'data:application/vnd.pyyacc.credential;base64,' + "meow".encode("base64")
         CredentialStore.add_resolver(EnvironmentResolver())
-        x = parse(self.fd(
-            """!credential "data:application/vnd.pyyacc.credential;provider=Unit%20Test;name=key," """))
+        x = parse(self.fd("""!credential "data:application/vnd.pyyacc.credential;provider=Unit%20Test;name=key," """))
         assert isinstance(x, Credential)
         self.assertEqual(x.fullstring(), 'data:application/vnd.pyyacc.credential;name=key;provider=Unit%20Test,meow')
         self.assertEqual(x, "meow")

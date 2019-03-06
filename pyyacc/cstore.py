@@ -7,6 +7,7 @@ CREDENTIAL_MIMETYPE = "application/vnd.pyyacc.credential"
 
 
 class CredentialBackend:
+
     def __init__(self, resolver):
         self.resolvers = [resolver]
 
@@ -21,12 +22,14 @@ class CredentialBackend:
 
 
 class DefaultResolver:
+
     def get(self, credential):
         return str(credential)
 
 
 class EnvironmentResolver:
     """Resolve values from the environment."""
+
     def clean(self, value):
         return re.sub(r'[^a-z0-9]', '_', value, flags=re.I)
 
@@ -36,8 +39,7 @@ class EnvironmentResolver:
         :param DataURI credential:
         """
         if 'name' in credential.parameters and 'provider' in credential.parameters:
-            key = self.clean('%s__%s' %
-                             (credential.parameters['provider'], credential.parameters['name']))
+            key = self.clean('%s__%s' % (credential.parameters['provider'], credential.parameters['name']))
             if key in os.environ:
                 LOG.info("resolved %s from the environment" % key)
                 return os.environ[key]

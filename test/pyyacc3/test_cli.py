@@ -8,11 +8,11 @@ from pyyacc3.compile import Compiler, Formatter, main
 from pyyacc3.descriptor import YaccDescriptor
 from pyyacc3.yml.extensions import Requirement, ValueSpec
 
-
 SPEC_YAML_PATH = os.path.join(os.path.dirname(__file__), "spec.yaml")
 
 
 class TestCLI(TestCase):
+
     def argparse(self, cl, **kwargs):
         c = Compiler()
         c.argparse(cl.split(" "))
@@ -37,13 +37,12 @@ class TestCLI(TestCase):
         self.argparse("--format=sh", arg_format="sh")
         self.argparse("--format sh", arg_format="sh")
         self.assertRaises(SystemExit, self.argparse, "-f xxx")
-        self.argparse("-f sh -o output cluster.yaml", arg_format="sh",
-                      arg_output="output", arg_overlays=["cluster.yaml"])
+        self.argparse(
+            "-f sh -o output cluster.yaml", arg_format="sh", arg_output="output", arg_overlays=["cluster.yaml"])
 
     def test_overlays(self):
         self.argparse("", arg_format="yaml")
-        self.argparse("--format=sh meow.yaml moo.yaml", arg_format="sh",
-                      arg_overlays=["meow.yaml", "moo.yaml"])
+        self.argparse("--format=sh meow.yaml moo.yaml", arg_format="sh", arg_overlays=["meow.yaml", "moo.yaml"])
 
     def test_validates(self):
         c = self.argparse("--no-validate --flat meow.yaml")
@@ -107,6 +106,7 @@ class TestCLI(TestCase):
 
 
 class TestMain(TestCase):
+
     def test_main_okay(self):
         fn = "moo.yaml"
         self.addCleanup(os.unlink, fn)
@@ -128,10 +128,8 @@ class TestFormatter(TestCase):
     def execute(self, format_, expected):
         c = Compiler()
         buf = StringIO.StringIO()
-        c.init(overlays=[os.path.join(os.path.dirname(__file__), "spec.yaml")],
-               validate=False,
-               format=format_,
-               output=buf)
+        c.init(
+            overlays=[os.path.join(os.path.dirname(__file__), "spec.yaml")], validate=False, format=format_, output=buf)
         c.execute()
         try:
             self.assertEquals(expected, buf.getvalue())

@@ -12,6 +12,7 @@ def fd(yamlstr):
 
 
 class BaseTest(unittest.TestCase):
+
     def open(self, filename):
         f = os.path.join(os.path.dirname(__file__), filename)
         return open(f)
@@ -182,6 +183,7 @@ class TestBuilder(BaseTest):
 
 
 class TestConfigParserFacade(BaseTest):
+
     def test1(self):
         builder, params = ConfigBuilder.parse(os.path.join(os.path.dirname(__file__), "spec.yaml"))
         v = builder.descriptor
