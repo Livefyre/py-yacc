@@ -1,6 +1,7 @@
 import re
 import urllib
 
+
 MIMETYPE_REGEX = r'[\w]+\/[\w\-\+\.]+'
 _MIMETYPE_RE = re.compile('^{}$'.format(MIMETYPE_REGEX))
 
@@ -9,13 +10,16 @@ _CHARSET_RE = re.compile('^{}$'.format(CHARSET_REGEX))
 
 PARAM_REGEX = r'[^;,]'
 
-DATA_URI_REGEX = (r'data:' + r'(?P<mimetype>{})?'.format(MIMETYPE_REGEX) + r'(?P<parameters>(?:\;\w+=[^;,]*)*)' +
-                  r'(?P<base64>\;base64)?' + r',(?P<data>.*)')
+DATA_URI_REGEX = (
+    r'data:' +
+    r'(?P<mimetype>{})?'.format(MIMETYPE_REGEX) +
+    r'(?P<parameters>(?:\;\w+=[^;,]*)*)' +
+    r'(?P<base64>\;base64)?' +
+    r',(?P<data>.*)')
 _DATA_URI_RE = re.compile(r'^{}$'.format(DATA_URI_REGEX), re.DOTALL)
 
 
 class DataURI(str):
-
     def __new__(cls, raw=None, mimetype=None, b64=False, data='', params=None):
         if raw:
             mimetype, params, b64, data = DataURI._parse(raw)
@@ -33,7 +37,6 @@ class DataURI(str):
         mimetype = match.group('mimetype') or None
         params = match.group('parameters') or None
         if params:
-
             def _param(p):
                 n, v = p.split("=", 1)
                 return n, urllib.unquote(v)

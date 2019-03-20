@@ -26,7 +26,6 @@ class Resolver(object):
             descriptor.merge(self.get_env_overlay([(s, k) for s, k, _ in descriptor.specs()]))
 
     def finalize(self, descriptor):
-
         def _final((section, key, spec)):
             LOG.debug("before - %s.%s=%s", section, key, spec.value)
             if isinstance(spec.value, EnvVar):
@@ -60,7 +59,8 @@ class Resolver(object):
         return overlay
 
     def resolve_env_key(self, section, key):
-        env_name = re.sub(r'[^a-z0-9]', '_', "%s__%s__%s" % (self.env_prefix, section, key), flags=re.I).upper()
+        env_name = re.sub(r'[^a-z0-9]', '_', "%s__%s__%s" %
+                          (self.env_prefix, section, key), flags=re.I).upper()
         var = EnvVar(env_name)
 
         try:
