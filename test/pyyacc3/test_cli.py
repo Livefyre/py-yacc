@@ -8,11 +8,11 @@ from pyyacc3.compile import Compiler, Formatter, main
 from pyyacc3.descriptor import YaccDescriptor
 from pyyacc3.yml.extensions import Requirement, ValueSpec
 
-
 SPEC_YAML_PATH = os.path.join(os.path.dirname(__file__), "spec.yaml")
 
 
 class TestCLI(TestCase):
+
     def argparse(self, cl, **kwargs):
         c = Compiler()
         c.argparse(cl.split(" "))
@@ -26,7 +26,8 @@ class TestCLI(TestCase):
             self.assertEqual(v, cval, "%s: %s != %s" % (k, v, cval))
 
     def test_basic_parse(self):
-        self.argparse("--flat meow.yaml", arg_flat=True, arg_overlays=["meow.yaml"])
+        self.argparse(
+            "--flat meow.yaml", arg_flat=True, arg_overlays=["meow.yaml"])
 
     def test_flags(self):
         self.argparse("--flat meow.yaml", arg_flat=True, arg_validate=True)
@@ -37,13 +38,18 @@ class TestCLI(TestCase):
         self.argparse("--format=sh", arg_format="sh")
         self.argparse("--format sh", arg_format="sh")
         self.assertRaises(SystemExit, self.argparse, "-f xxx")
-        self.argparse("-f sh -o output cluster.yaml", arg_format="sh",
-                      arg_output="output", arg_overlays=["cluster.yaml"])
+        self.argparse(
+            "-f sh -o output cluster.yaml",
+            arg_format="sh",
+            arg_output="output",
+            arg_overlays=["cluster.yaml"])
 
     def test_overlays(self):
         self.argparse("", arg_format="yaml")
-        self.argparse("--format=sh meow.yaml moo.yaml", arg_format="sh",
-                      arg_overlays=["meow.yaml", "moo.yaml"])
+        self.argparse(
+            "--format=sh meow.yaml moo.yaml",
+            arg_format="sh",
+            arg_overlays=["meow.yaml", "moo.yaml"])
 
     def test_validates(self):
         c = self.argparse("--no-validate --flat meow.yaml")
@@ -55,11 +61,13 @@ class TestCLI(TestCase):
         self.assertRaises(ValueError, c.validate)
 
         c = self.argparse("--flat -f sh meow.yaml", arg_format="sh")
-        c.arg_descriptor = YaccDescriptor(dict(meow=dict(moo=ValueSpec(str, Requirement("meow")))))
+        c.arg_descriptor = YaccDescriptor(
+            dict(meow=dict(moo=ValueSpec(str, Requirement("meow")))))
         self.assertRaises(ValueError, c.validate)
 
         c = self.argparse("")
-        c.arg_descriptor = YaccDescriptor(dict(meow=dict(moo=ValueSpec(str, Requirement("meow")))))
+        c.arg_descriptor = YaccDescriptor(
+            dict(meow=dict(moo=ValueSpec(str, Requirement("meow")))))
         c.errors = [('meow', 'moo', 'err')]
         self.assertRaises(ValueError, c.validate)
         try:
@@ -102,16 +110,19 @@ class TestCLI(TestCase):
         self.assertFalse(os.path.exists(fn))
         with c.output_stream() as out:
             Formatter({"meow": True}).format_yaml(out)
-            self.assertFalse(os.path.exists(fn))  # data is only flushed at close
+            self.assertFalse(
+                os.path.exists(fn))  # data is only flushed at close
         self.assertTrue(os.path.exists(fn))
 
 
 class TestMain(TestCase):
+
     def test_main_okay(self):
         fn = "moo.yaml"
         self.addCleanup(os.unlink, fn)
         self.assertFalse(os.path.exists(fn))
-        main(("-f yaml -o %s --no-validate %s" % (fn, SPEC_YAML_PATH)).split(" "))
+        main((
+            "-f yaml -o %s --no-validate %s" % (fn, SPEC_YAML_PATH)).split(" "))
         self.assertTrue(os.path.exists(fn))
 
     def test_main_validate_fails(self):
@@ -130,10 +141,11 @@ class TestFormatter(TestCase):
         err_fname = fname + ".err"
         c = Compiler()
         buf = io.StringIO()
-        c.init(overlays=[os.path.join(os.path.dirname(__file__), "spec.yaml")],
-               validate=False,
-               format=format_,
-               output=buf)
+        c.init(
+            overlays=[os.path.join(os.path.dirname(__file__), "spec.yaml")],
+            validate=False,
+            format=format_,
+            output=buf)
         c.execute()
         try:
             self.assertEqual(open(fname).read(), buf.getvalue())
@@ -154,4 +166,3 @@ class TestFormatter(TestCase):
 
     def test_format_make(self):
         self.execute("make")
-

@@ -1,7 +1,8 @@
-from logging import getLogger
-from pyyacc3.yml.extensions import ValueSpec
-from collections import defaultdict
 import collections
+from collections import defaultdict
+from logging import getLogger
+
+from pyyacc3.yml.extensions import ValueSpec
 
 LOG = getLogger(__name__)
 
@@ -57,5 +58,8 @@ class YaccDescriptor(defaultdict):
         :param Dict[str, Dict[str, *]] overlay: values to merge.
         """
         for section in [s for s in list(overlay.keys()) if s in self]:
-            for key in [k for k in list(overlay[section].keys()) if k in self[section]]:
+            for key in [
+                    k for k in list(overlay[section].keys())
+                    if k in self[section]
+            ]:
                 self[section][key].value = overlay[section][key]

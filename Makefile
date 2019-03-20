@@ -1,7 +1,5 @@
 .PHONY: test
 
-PY_SRC = $(shell git ls-files | grep '.py')
-
 coverage: test
 	open cover/index.html
 
@@ -18,6 +16,6 @@ env/bin/activate: setup.py requirements.txt
 	touch $@
 
 
-lint: $(PY_SRC)
-	isort $(PY_SRC)
-	yapf -i $(PY_SRC)
+lint:
+	env/bin/isort -q --recursive test pyyacc3
+	env/bin/yapf -i --recursive test pyyacc3

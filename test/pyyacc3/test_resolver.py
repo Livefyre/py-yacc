@@ -5,6 +5,7 @@ from pyyacc3.resolver import Resolver
 
 
 class TestResolver(TestCase):
+
     def env(self, **kwargs):
         for k, v in kwargs.items():
             os.environ[k] = v

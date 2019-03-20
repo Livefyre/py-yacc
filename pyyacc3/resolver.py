@@ -1,10 +1,11 @@
-from pyyacc3.yml.extensions import EnvVar
 import collections
 import os
 import re
-from pyyacc3.yml import load
-from logging import getLogger
 import sys
+from logging import getLogger
+
+from pyyacc3.yml import load
+from pyyacc3.yml.extensions import EnvVar
 
 LOG = getLogger(__name__)
 
@@ -14,7 +15,10 @@ class Resolver(object):
 
     PYYACC_RESOLVER__ENV_PREFIX = "YACC_RESOLVER__ENV_PREFIX"
 
-    def __init__(self, wdir, env_prefix="YACC", default_env_overlay="YACC__OVERLAY"):
+    def __init__(self,
+                 wdir,
+                 env_prefix="YACC",
+                 default_env_overlay="YACC__OVERLAY"):
         self.wdir = wdir
         self.default_env_overlay = default_env_overlay
         self.env_prefix = env_prefix
@@ -23,9 +27,12 @@ class Resolver(object):
         list(map(descriptor.merge, provided_overlays))
         if not ignore_environment:
             list(map(descriptor.merge, self.get_extra_overlays()))
-            descriptor.merge(self.get_env_overlay([(s, k) for s, k, _ in descriptor.specs()]))
+            descriptor.merge(
+                self.get_env_overlay(
+                    [(s, k) for s, k, _ in descriptor.specs()]))
 
     def finalize(self, descriptor):
+
         def _final(section_key_spec):
             (section, key, spec) = section_key_spec
             LOG.debug("before - %s.%s=%s", section, key, spec.value)
@@ -60,8 +67,11 @@ class Resolver(object):
         return overlay
 
     def resolve_env_key(self, section, key):
-        env_name = re.sub(r'[^a-z0-9]', '_', "%s__%s__%s" %
-                          (self.env_prefix, section, key), flags=re.I).upper()
+        env_name = re.sub(
+            r'[^a-z0-9]',
+            '_',
+            "%s__%s__%s" % (self.env_prefix, section, key),
+            flags=re.I).upper()
         var = EnvVar(env_name)
 
         try:
@@ -88,7 +98,9 @@ class Resolver(object):
             return load(sys.stdin.read())
         filename = os.path.expanduser(os.path.expandvars(fn))
         try:
-            filename = list(filter(os.path.exists, [filename, os.path.join(self.wdir, filename)]))[0]
+            filename = list(
+                filter(os.path.exists,
+                       [filename, os.path.join(self.wdir, filename)]))[0]
         except IndexError:
             raise IOError("%s does not exist (wd: %s)." % (filename, self.wdir))
         try:

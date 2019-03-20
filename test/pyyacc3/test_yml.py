@@ -2,18 +2,19 @@ import io
 import unittest
 
 from pyyacc3.yml import load
-from pyyacc3.yml.extensions import Requirement, URI, ValueSpec, Optional
-
+from pyyacc3.yml.extensions import URI, Optional, Requirement, ValueSpec
 
 parse = load
 
 
 class TestRegistration(unittest.TestCase):
+
     def test_required(self):
         load("!required cluster.yaml")
 
 
 class TestParser(unittest.TestCase):
+
     def fd(self, string):
         return io.StringIO(string)
 
@@ -45,6 +46,9 @@ class TestParser(unittest.TestCase):
         assert not x.examples
         assert not x.deprecated
 
-        x = parse(self.fd("""!spec\ntype: !!int "0"\ndescription:\nvalue: 1\ndeprecated: true"""))
+        x = parse(
+            self.
+            fd("""!spec\ntype: !!int "0"\ndescription:\nvalue: 1\ndeprecated: true"""
+              ))
         assert x.deprecated
         repr(x)

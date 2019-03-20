@@ -1,8 +1,11 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 from pyyacc3 import __version__
 
-tests_require = ['tox', 'pytest', 'pytest-cov', 'mock', 'nose>=1.0', 'coverage', 'coverage_pth', 'nosexcover']
+tests_require = [
+    'tox', 'pytest', 'pytest-cov', 'mock', 'nose>=1.0', 'coverage',
+    'coverage_pth', 'nosexcover'
+]
 
 setup(
     name="py-yacc",
@@ -10,7 +13,8 @@ setup(
     python_requires='>3.5.2',
     author="Nino Walker",
     author_email="nino.walker@gmail.com",
-    description=("A YAML based configuration DSL and associated parser/validator."),
+    description=(
+        "A YAML based configuration DSL and associated parser/validator."),
     url="https://github.com/Livefyre/py-yacc",
     license="BSD",
     packages=find_packages(exclude=('test',)),
@@ -27,11 +31,16 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     tests_require=tests_require,
-    extras_require={'test': tests_require, 'dev': ['isort', 'yapf']},
+    extras_require={
+        'test': tests_require,
+        'dev': ['isort', 'yapf']
+    },
     entry_points={
-        'console_scripts': ['pyyacc.validate = pyyacc.scripts.compile:validate_main',  # deprecated
-                            'pyyacc = pyyacc.scripts.compile:validate_main',
-                            'pyyacc3 = pyyacc3.compile:main']
+        'console_scripts': [
+            'pyyacc.validate = pyyacc.scripts.compile:validate_main',  # deprecated
+            'pyyacc = pyyacc.scripts.compile:validate_main',
+            'pyyacc3 = pyyacc3.compile:main'
+        ]
     },
     zip_safe=True,
 )

@@ -1,15 +1,19 @@
-from yaml import load as _load, dump as _dump
+from logging import getLogger
+
+from yaml import dump as _dump
+from yaml import load as _load
+
 try:
     from yaml import CLoader as __Loader, CDumper as __Dumper
 except ImportError:
     from yaml import Loader as __Loader, Dumper as __Dumper
-from logging import getLogger
 
 LOG = getLogger(__name__)
 EXTENSION_REGISTRY = {}
 
 
 def register(type_, factory="_yaml_constructor", repr_="_yaml_representer"):
+
     def _wrapper(cls):
         cls._yaml_tag = type_
 
@@ -19,9 +23,9 @@ def register(type_, factory="_yaml_constructor", repr_="_yaml_representer"):
             if dump:
                 dumper.add_representer(cls, dump)
 
-
         EXTENSION_REGISTRY[type_] = _register
         return cls
+
     return _wrapper
 
 
@@ -41,6 +45,7 @@ def dump(params, stream, Dumper=None, **kwargs):
 def getLoader():
     _register_types()
     return __Loader
+
 
 def getDumper():
     _register_types()

@@ -1,15 +1,15 @@
-from logging import getLogger
 import os
 import urllib.parse
+from logging import getLogger
 
 from pyyacc3.yml import register
-
 
 LOG = getLogger(__name__)
 
 
 class _Scalar(object):
     'Provides a simple representer.'
+
     @classmethod
     def _yaml_representer(cls, dumper, data):
         return dumper.represent_scalar(cls._yaml_tag, "%s" % data, style='"')
@@ -19,7 +19,13 @@ class _Scalar(object):
 class ValueSpec(object):
     """Declares and documents acceptable values for a setting."""
 
-    def __init__(self, type, description=None, value=None, examples=None, deprecated=False, sensitive=False):  # @ReservedAssignment
+    def __init__(self,
+                 type,
+                 description=None,
+                 value=None,
+                 examples=None,
+                 deprecated=False,
+                 sensitive=False):  # @ReservedAssignment
         self.type = type
         self.optional = isinstance(value, Optional)
         self.value = None if self.optional else value
@@ -38,7 +44,8 @@ class ValueSpec(object):
                 raise ValueError("Value was undefined: %s" % input_)
             return input_
         if not isinstance(input_, self.expected_type):
-            t = TypeError("TypeError - expected %s, got %s; val: %s" % (self.expected_type, type(input_), input_))
+            t = TypeError("TypeError - expected %s, got %s; val: %s" %
+                          (self.expected_type, type(input_), input_))
             if fail:
                 raise t
             return ConfigError(str(t))
@@ -53,7 +60,8 @@ class ValueSpec(object):
         return cls(**d)
 
     def coerce(self, input_):
-        if getattr(self.type, 'pyyacc_coerce', None) and not getattr(input_, '_pyyacc_no_coerce', False):
+        if getattr(self.type, 'pyyacc_coerce',
+                   None) and not getattr(input_, '_pyyacc_no_coerce', False):
             input_ = self.type.pyyacc_coerce(input_)
         return input_
 
@@ -99,6 +107,7 @@ class Optional(_Scalar):
 
 @register("!uri")
 class URI(str, _Scalar):
+
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls.pyyacc_coerce(loader.construct_scalar(node))
@@ -123,8 +132,10 @@ class URI(str, _Scalar):
         if not p.scheme:
             raise ValueError("Unparseable URL: %s" % self)
 
+
 @register("!err")
 class ConfigError(ValueError, _Scalar):
+
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls.pyyacc_coerce(loader.construct_scalar(str(node)))
@@ -133,6 +144,7 @@ class ConfigError(ValueError, _Scalar):
 @register("!environment")
 class EnvVar(str, _Scalar):
     """A pointer to a value in the environment."""
+
     def __new__(cls, name):
         evar = super(EnvVar, cls).__new__(cls, name)
         return evar
@@ -151,7 +163,6 @@ class EnvVar(str, _Scalar):
             except:
                 LOG.warning("Error parsing environment value from %s", self)
                 raise
-
 
     @classmethod
     def _yaml_constructor(cls, loader, node):

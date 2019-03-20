@@ -1,22 +1,20 @@
-from configparser import ConfigParser
 import io
-from collections import defaultdict
-from contextlib import contextmanager
 import itertools
 import json
-from logging import getLogger
 import logging
-from optparse import OptionParser
 import os
 import pickle
 import sys
-
-from safeoutput import open as safeopen
+from collections import defaultdict
+from configparser import ConfigParser
+from contextlib import contextmanager
+from logging import getLogger
+from optparse import OptionParser
 
 from pyyacc3.descriptor import YaccDescriptor
 from pyyacc3.resolver import Resolver
-from pyyacc3.yml import load, dump
-
+from pyyacc3.yml import dump, load
+from safeoutput import open as safeopen
 
 LOG = getLogger(__name__)
 
@@ -48,40 +46,61 @@ class Compiler(object):
 
     def parser(self):
         parser = OptionParser(usage=self._usage)
-        parser.add_option("-v", dest="arg_verbose",
-                          action="store_const",
-                          default=self.arg_verbose,
-                          const=logging.INFO,
-                          help="Verbose logging output.")
-        parser.add_option("-V", dest="arg_verbose",
-                          action="store_const",
-                          default=self.arg_verbose,
-                          const=logging.DEBUG,
-                          help="Very verbose logging output.")
-        parser.add_option("--flat", dest="arg_flat",
-                          action="store_true",
-                          default=self.arg_flat,
-                          help="Flatten into 'section.key': value notation")
-        parser.add_option("-f", "--format", dest="arg_format",
-                          default="yaml",
-                          choices=self._formats,
-                          help="Output format: yaml, json, sh, make are supported.")
-        parser.add_option("--no-validate", dest="arg_validate",
-                          action="store_false",
-                          default=self.arg_validate,
-                          help="Disable validation [default: on]")
-        parser.add_option("-o", "--output", dest="arg_output",
-                          default=self.arg_output,
-                          help="Output destination: path where to write output. If not provided, stdout is used.")
-        parser.add_option("--env-prefix", dest="arg_env_prefix",
-                          default=self.arg_env_prefix,
-                          help="Prefix for overlays from the environment")
-        parser.add_option("--env-overlay", dest="arg_env_overlay",
-                          default=self.arg_env_overlay,
-                          help="Name of an overlay to load from the environment")
-        parser.add_option("--key", dest="arg_key",
-                          default=self.arg_key,
-                          help="Output a single key (section.key)")
+        parser.add_option(
+            "-v",
+            dest="arg_verbose",
+            action="store_const",
+            default=self.arg_verbose,
+            const=logging.INFO,
+            help="Verbose logging output.")
+        parser.add_option(
+            "-V",
+            dest="arg_verbose",
+            action="store_const",
+            default=self.arg_verbose,
+            const=logging.DEBUG,
+            help="Very verbose logging output.")
+        parser.add_option(
+            "--flat",
+            dest="arg_flat",
+            action="store_true",
+            default=self.arg_flat,
+            help="Flatten into 'section.key': value notation")
+        parser.add_option(
+            "-f",
+            "--format",
+            dest="arg_format",
+            default="yaml",
+            choices=self._formats,
+            help="Output format: yaml, json, sh, make are supported.")
+        parser.add_option(
+            "--no-validate",
+            dest="arg_validate",
+            action="store_false",
+            default=self.arg_validate,
+            help="Disable validation [default: on]")
+        parser.add_option(
+            "-o",
+            "--output",
+            dest="arg_output",
+            default=self.arg_output,
+            help="Output destination: path where to write output. If not provided, stdout is used."
+        )
+        parser.add_option(
+            "--env-prefix",
+            dest="arg_env_prefix",
+            default=self.arg_env_prefix,
+            help="Prefix for overlays from the environment")
+        parser.add_option(
+            "--env-overlay",
+            dest="arg_env_overlay",
+            default=self.arg_env_overlay,
+            help="Name of an overlay to load from the environment")
+        parser.add_option(
+            "--key",
+            dest="arg_key",
+            default=self.arg_key,
+            help="Output a single key (section.key)")
         return parser
 
     def init(self, **kwargs):
@@ -117,18 +136,22 @@ class Compiler(object):
         overlays = [_f for _f in map(parse, self.arg_overlays) if _f]
 
         if not overlays:
-            raise ValueError("No valid descriptor or overlays provided: [%s]" % ", ".join(self.arg_overlays))
+            raise ValueError("No valid descriptor or overlays provided: [%s]" %
+                             ", ".join(self.arg_overlays))
 
         self.arg_parsed = [] + overlays
 
         d = YaccDescriptor(overlays[0])
         if not d:
+
             def reduce_():
                 d = defaultdict(dict)
-                for section in set(itertools.chain(*[list(o.keys()) for o in overlays])):
+                for section in set(
+                        itertools.chain(*[list(o.keys()) for o in overlays])):
                     for o in overlays:
                         d[section].update(o.get(section, {}))
                 return dict(d)
+
             self.errors = None
             self.params = reduce_()
             return
@@ -166,7 +189,8 @@ class Compiler(object):
         if self.errors and not self.arg_validate:
             for section, key, _err in self.errors:
                 self.params[section] = self.params.get(section, {})
-                self.params[section][key] = self.arg_descriptor[section][key].value
+                self.params[section][key] = self.arg_descriptor[section][
+                    key].value
 
         if self.arg_key:
             section, key = self.arg_key.split(".", 1)
@@ -178,7 +202,10 @@ class Compiler(object):
             self.params = {section: {key: self.params[section][key]}}
 
         if self.arg_flat:
-            d = {"%s.%s" % (section, key): self.params[section][key] for section in self.params for key in self.params[section]}
+            d = {
+                "%s.%s" % (section, key): self.params[section][key]
+                for section in self.params for key in self.params[section]
+            }
             self.params = d
 
         with self.output_stream() as output:
@@ -210,7 +237,7 @@ class Formatter(object):
 
     def __init__(self, params):
         self.params = dict(params)
-        
+
     def format_(self, format_, output):
         getattr(self, "format_%s" % format_)(output)
 
@@ -224,10 +251,7 @@ class Formatter(object):
         pickle.dump(self.params, output)
 
     def format_json(self, output):
-        json.dump(self.params,
-                  output,
-                  sort_keys=True,
-                  default=repr)
+        json.dump(self.params, output, sort_keys=True, default=repr)
 
     def format_ini(self, output):
         p = ConfigParser()
@@ -237,22 +261,27 @@ class Formatter(object):
             p.set(section, key, str(value))
 
         p.write(output)
-        
+
     def _flatten(self, norm_key):
         for section in sorted(self.params.keys()):
-            for key, value in sorted(list(self.params[section].items()), key=lambda k__v: k__v[0]):
+            for key, value in sorted(
+                    list(self.params[section].items()),
+                    key=lambda k__v: k__v[0]):
                 yield norm_key(section, key), value
 
     def _norm_sh_key(self, section, key):
-        return "%s__%s" % (section.upper().replace("-", "_"), key.upper().replace("-", "_"))
-        
+        return "%s__%s" % (section.upper().replace("-", "_"),
+                           key.upper().replace("-", "_"))
+
     def format_sh(self, output):
         for key, value in self._flatten(self._norm_sh_key):
             if value is None:
                 print("# %s is unset" % key, file=output)
                 continue
-            print("read -r -d '' %s<<EOF\n%s\nEOF\nexport %s" % (
-                key, str(value), key), file=output)
+            print(
+                "read -r -d '' %s<<EOF\n%s\nEOF\nexport %s" % (key, str(value),
+                                                               key),
+                file=output)
 
     def format_make(self, output):
         for key, value in self._flatten(self._norm_sh_key):
