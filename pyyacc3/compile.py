@@ -220,19 +220,6 @@ class Formatter(object):
     def format_yaml(self, output):
         dump(self.params, output, default_flow_style=False)
 
-    def format_sh(self, output):
-        def _norm_sh_key(k):
-            return k.upper().replace("-", "_")
-
-        for section in self.params:
-            for key, value in self.params[section].iteritems():
-                sh_key = "%s__%s" % (_norm_sh_key(section), _norm_sh_key(key))
-                if value is None:
-                    print >> output, "# %s is unset" % sh_key
-                    continue
-                print >> output, "read -r -d '' %s<<EOF\n%s\nEOF\nexport %s" % (
-                    sh_key, str(value), sh_key)
-
     def format_pickle(self, output):
         pickle.dump(self.params, output)
 
@@ -251,19 +238,33 @@ class Formatter(object):
 
         map(populate, self.params.keys())
         p.write(output)
+        
+    def _flatten(self, norm_key):
+        for section in sorted(self.params.keys()):
+            for key, value in sorted(self.params[section].items(), key=lambda (k,_v): k):
+                key = "%s__%s" % (norm_key(section), norm_key(key))
+                yield key, value
+        
+    def format_sh(self, output):
+        def _norm_sh_key(k):
+            return k.upper().replace("-", "_")
+
+        for key, value in self._flatten(_norm_sh_key):
+            if value is None:
+                print >> output, "# %s is unset" % key
+                continue
+            print >> output, "read -r -d '' %s<<EOF\n%s\nEOF\nexport %s" % (
+                key, str(value), key)
 
     def format_make(self, output):
         def _norm_sh_key(k):
             return k.upper().replace("-", "_")
 
-        for section in self.params:
-            for key, value in self.params[section].iteritems():
-                if value is None:
-                    print >> output, "# %s__%s is unset" % (
-                        _norm_sh_key(section), _norm_sh_key(key))
-                else:
-                    print >> output, "define %s__%s\n%s\nendef" % (
-                        _norm_sh_key(section), _norm_sh_key(key), str(value))
+        for key, value in self._flatten(_norm_sh_key):
+            if value is None:
+                print >> output, "# %s is unset" % key
+            else:
+                print >> output, "define %s\n%s\nendef" % (key, str(value))
 
 
 def main(args=sys.argv[1:]):

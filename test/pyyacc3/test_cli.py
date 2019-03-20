@@ -123,9 +123,11 @@ class TestMain(TestCase):
 
 
 class TestFormatter(TestCase):
-    maxDiff = None
+    maxDiff = 100
 
-    def execute(self, format_, expected):
+    def execute(self, format_):
+        fname = os.path.dirname(__file__) + "/expected-output-" + format_
+        err_fname = fname + ".err"
         c = Compiler()
         buf = StringIO.StringIO()
         c.init(overlays=[os.path.join(os.path.dirname(__file__), "spec.yaml")],
@@ -134,167 +136,22 @@ class TestFormatter(TestCase):
                output=buf)
         c.execute()
         try:
-            self.assertEquals(expected, buf.getvalue())
+            self.assertEquals(open(fname).read(), buf.getvalue())
         except:
-            with open(format_, "w") as o:
+            with open(err_fname, "w") as o:
                 o.write(buf.getvalue())
-            print "Failure; output rendered to: %s" % format_
+            print "Failure; output rendered to: %s" % err_fname
             raise
 
     def test_format_yaml(self):
-        self.execute("yaml", YAML_OUTPUT)
+        self.execute("yaml")
 
     def test_sh(self):
-        self.execute("sh", SH_OUTPUT)
+        self.execute("sh")
 
     def test_format_ini(self):
-        self.execute("ini", INI_OUTPUT)
+        self.execute("ini")
 
     def test_format_make(self):
-        self.execute("make", MAKE_OUTPUT)
+        self.execute("make")
 
-
-YAML_OUTPUT = """email:
-  backend: !required "Requirement(must be set in the environment.yaml)"
-  cruft: Iamdead
-  from_address: notify@example.com
-misconfiguration_examples:
-  invalid_value: I am a string.
-mqueue:
-  redis_host: !required "Requirement(from cluster)"
-tests:
-  bool: false
-  float: 100.1
-  int: 1
-  list:
-  - 1
-  optlist: null
-uris:
-  mongo: !uri "mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test"
-  mongo-sock: !uri "mongodb:///tmp/mongodb-27017.sock"
-  smtp: !uri "smtp://example.com:25/"
-  www: !uri "http://www.google.com"
-"""
-
-SH_OUTPUT = """read -r -d '' MISCONFIGURATION_EXAMPLES__INVALID_VALUE<<EOF
-I am a string.
-EOF
-export MISCONFIGURATION_EXAMPLES__INVALID_VALUE
-read -r -d '' TESTS__INT<<EOF
-1
-EOF
-export TESTS__INT
-read -r -d '' TESTS__BOOL<<EOF
-False
-EOF
-export TESTS__BOOL
-read -r -d '' TESTS__FLOAT<<EOF
-100.1
-EOF
-export TESTS__FLOAT
-read -r -d '' TESTS__LIST<<EOF
-[1]
-EOF
-export TESTS__LIST
-# TESTS__OPTLIST is unset
-read -r -d '' MQUEUE__REDIS_HOST<<EOF
-Requirement(from cluster)
-EOF
-export MQUEUE__REDIS_HOST
-read -r -d '' EMAIL__BACKEND<<EOF
-Requirement(must be set in the environment.yaml)
-EOF
-export EMAIL__BACKEND
-read -r -d '' EMAIL__FROM_ADDRESS<<EOF
-notify@example.com
-EOF
-export EMAIL__FROM_ADDRESS
-read -r -d '' EMAIL__CRUFT<<EOF
-Iamdead
-EOF
-export EMAIL__CRUFT
-read -r -d '' URIS__WWW<<EOF
-http://www.google.com
-EOF
-export URIS__WWW
-read -r -d '' URIS__SMTP<<EOF
-smtp://example.com:25/
-EOF
-export URIS__SMTP
-read -r -d '' URIS__MONGO<<EOF
-mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
-EOF
-export URIS__MONGO
-read -r -d '' URIS__MONGO_SOCK<<EOF
-mongodb:///tmp/mongodb-27017.sock
-EOF
-export URIS__MONGO_SOCK
-"""
-
-INI_OUTPUT = """[misconfiguration_examples]
-invalid_value = I am a string.
-
-[tests]
-int = 1
-bool = False
-float = 100.1
-list = [1]
-optlist = None
-
-[mqueue]
-redis_host = Requirement(from cluster)
-
-[email]
-backend = Requirement(must be set in the environment.yaml)
-from_address = notify@example.com
-cruft = Iamdead
-
-[uris]
-www = http://www.google.com
-smtp = smtp://example.com:25/
-mongo = mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
-mongo-sock = mongodb:///tmp/mongodb-27017.sock
-
-"""
-
-MAKE_OUTPUT = """define MISCONFIGURATION_EXAMPLES__INVALID_VALUE
-I am a string.
-endef
-define TESTS__INT
-1
-endef
-define TESTS__BOOL
-False
-endef
-define TESTS__FLOAT
-100.1
-endef
-define TESTS__LIST
-[1]
-endef
-# TESTS__OPTLIST is unset
-define MQUEUE__REDIS_HOST
-Requirement(from cluster)
-endef
-define EMAIL__BACKEND
-Requirement(must be set in the environment.yaml)
-endef
-define EMAIL__FROM_ADDRESS
-notify@example.com
-endef
-define EMAIL__CRUFT
-Iamdead
-endef
-define URIS__WWW
-http://www.google.com
-endef
-define URIS__SMTP
-smtp://example.com:25/
-endef
-define URIS__MONGO
-mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
-endef
-define URIS__MONGO_SOCK
-mongodb:///tmp/mongodb-27017.sock
-endef
-"""

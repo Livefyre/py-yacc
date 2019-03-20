@@ -1,0 +1,53 @@
+read -r -d '' EMAIL__BACKEND<<EOF
+Requirement(must be set in the environment.yaml)
+EOF
+export EMAIL__BACKEND
+read -r -d '' EMAIL__CRUFT<<EOF
+Iamdead
+EOF
+export EMAIL__CRUFT
+read -r -d '' EMAIL__FROM_ADDRESS<<EOF
+notify@example.com
+EOF
+export EMAIL__FROM_ADDRESS
+read -r -d '' MISCONFIGURATION_EXAMPLES__INVALID_VALUE<<EOF
+I am a string.
+EOF
+export MISCONFIGURATION_EXAMPLES__INVALID_VALUE
+read -r -d '' MQUEUE__REDIS_HOST<<EOF
+Requirement(from cluster)
+EOF
+export MQUEUE__REDIS_HOST
+read -r -d '' TESTS__BOOL<<EOF
+False
+EOF
+export TESTS__BOOL
+read -r -d '' TESTS__FLOAT<<EOF
+100.1
+EOF
+export TESTS__FLOAT
+read -r -d '' TESTS__INT<<EOF
+1
+EOF
+export TESTS__INT
+read -r -d '' TESTS__LIST<<EOF
+[1]
+EOF
+export TESTS__LIST
+# TESTS__OPTLIST is unset
+read -r -d '' URIS__MONGO<<EOF
+mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
+EOF
+export URIS__MONGO
+read -r -d '' URIS__MONGO_SOCK<<EOF
+mongodb:///tmp/mongodb-27017.sock
+EOF
+export URIS__MONGO_SOCK
+read -r -d '' URIS__SMTP<<EOF
+smtp://example.com:25/
+EOF
+export URIS__SMTP
+read -r -d '' URIS__WWW<<EOF
+http://www.google.com
+EOF
+export URIS__WWW

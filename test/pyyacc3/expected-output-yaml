@@ -1,0 +1,20 @@
+email:
+  backend: !required "Requirement(must be set in the environment.yaml)"
+  cruft: Iamdead
+  from_address: notify@example.com
+misconfiguration_examples:
+  invalid_value: I am a string.
+mqueue:
+  redis_host: !required "Requirement(from cluster)"
+tests:
+  bool: false
+  float: 100.1
+  int: 1
+  list:
+  - 1
+  optlist: null
+uris:
+  mongo: !uri "mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test"
+  mongo-sock: !uri "mongodb:///tmp/mongodb-27017.sock"
+  smtp: !uri "smtp://example.com:25/"
+  www: !uri "http://www.google.com"

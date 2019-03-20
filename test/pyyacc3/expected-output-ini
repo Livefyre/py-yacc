@@ -1,0 +1,24 @@
+[misconfiguration_examples]
+invalid_value = I am a string.
+
+[tests]
+int = 1
+bool = False
+float = 100.1
+list = [1]
+optlist = None
+
+[mqueue]
+redis_host = Requirement(from cluster)
+
+[email]
+backend = Requirement(must be set in the environment.yaml)
+from_address = notify@example.com
+cruft = Iamdead
+
+[uris]
+www = http://www.google.com
+smtp = smtp://example.com:25/
+mongo = mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
+mongo-sock = mongodb:///tmp/mongodb-27017.sock
+

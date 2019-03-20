@@ -1,0 +1,40 @@
+define EMAIL__BACKEND
+Requirement(must be set in the environment.yaml)
+endef
+define EMAIL__CRUFT
+Iamdead
+endef
+define EMAIL__FROM_ADDRESS
+notify@example.com
+endef
+define MISCONFIGURATION_EXAMPLES__INVALID_VALUE
+I am a string.
+endef
+define MQUEUE__REDIS_HOST
+Requirement(from cluster)
+endef
+define TESTS__BOOL
+False
+endef
+define TESTS__FLOAT
+100.1
+endef
+define TESTS__INT
+1
+endef
+define TESTS__LIST
+[1]
+endef
+# TESTS__OPTLIST is unset
+define URIS__MONGO
+mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test
+endef
+define URIS__MONGO_SOCK
+mongodb:///tmp/mongodb-27017.sock
+endef
+define URIS__SMTP
+smtp://example.com:25/
+endef
+define URIS__WWW
+http://www.google.com
+endef
