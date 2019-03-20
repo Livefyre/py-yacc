@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3*
       - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "setup.py" }}
       - run:
@@ -20,10 +20,10 @@ jobs:
           paths:
             - ".venv"
             - "/usr/local/bin"
-            - "/usr/local/lib/python2.7/site-packages"
+            - "/usr/local/lib/python*/site-packages"
       - run:
           command: |
-            sudo pip install -e .
+            sudo pip install -e . -e .[test]
       - run:
           command: |
             nosetests --with-xcover --cover-html
