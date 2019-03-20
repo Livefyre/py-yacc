@@ -12,3 +12,6 @@ build
 /nosetests.xml
 .coverage
 /dist
+coverage
+.coverage
+/.tox

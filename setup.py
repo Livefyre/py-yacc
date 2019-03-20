@@ -1,6 +1,8 @@
 from setuptools import setup, find_packages
 
-from pyyacc import __version__
+from pyyacc3 import __version__
+
+tests_require = ['tox', 'pytest', 'pytest-cov', 'mock', 'nose>=1.0', 'coverage', 'coverage_pth', 'nosexcover']
 
 setup(
     name="py-yacc",
@@ -16,11 +18,19 @@ setup(
     install_requires=['PyYAML>=3.12', 'safeoutput'],
     classifiers=[
         "License :: OSI Approved :: BSD License",
+        'Development Status :: 5 - Production/Stable',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: System :: Filesystems',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.5',
     ],
+    tests_require=tests_require,
+    extras_require={'test': tests_require},
     entry_points={
-        'console_scripts': ['pyyacc.validate = pyyacc.scripts.compile:validate_main', # deprecated
+        'console_scripts': ['pyyacc.validate = pyyacc.scripts.compile:validate_main',  # deprecated
                             'pyyacc = pyyacc.scripts.compile:validate_main',
                             'pyyacc3 = pyyacc3.compile:main']
     },
-    extras_require={'test': ['mock', 'nose>=1.0', 'coverage', 'nosexcover']}
+    zip_safe=True,
 )
