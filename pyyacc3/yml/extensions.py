@@ -4,12 +4,12 @@ import urlparse
 
 from pyyacc3.yml import register
 
+
 LOG = getLogger(__name__)
 
 
 class _Scalar(object):
     'Provides a simple representer.'
-
     @classmethod
     def _yaml_representer(cls, dumper, data):
         return dumper.represent_scalar(cls._yaml_tag, u"%s" % data, style='"')
@@ -19,8 +19,7 @@ class _Scalar(object):
 class ValueSpec(object):
     """Declares and documents acceptable values for a setting."""
 
-    def __init__(self, type, description=None, value=None, examples=None, deprecated=False,
-                 sensitive=False):  # @ReservedAssignment
+    def __init__(self, type, description=None, value=None, examples=None, deprecated=False, sensitive=False):  # @ReservedAssignment
         self.type = type
         self.optional = isinstance(value, Optional)
         self.value = None if self.optional else value
@@ -100,7 +99,6 @@ class Optional(_Scalar):
 
 @register("!uri")
 class URI(unicode, _Scalar):
-
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls.pyyacc_coerce(loader.construct_scalar(node))
@@ -125,10 +123,8 @@ class URI(unicode, _Scalar):
         if not p.scheme:
             raise ValueError("Unparseable URL: %s" % self)
 
-
 @register("!err")
 class ConfigError(ValueError, _Scalar):
-
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls.pyyacc_coerce(loader.construct_scalar(str(node)))
@@ -137,7 +133,6 @@ class ConfigError(ValueError, _Scalar):
 @register("!environment")
 class EnvVar(str, _Scalar):
     """A pointer to a value in the environment."""
-
     def __new__(cls, name):
         evar = super(EnvVar, cls).__new__(cls, name)
         return evar
@@ -156,6 +151,7 @@ class EnvVar(str, _Scalar):
             except:
                 LOG.warning("Error parsing environment value from %s", self)
                 raise
+
 
     @classmethod
     def _yaml_constructor(cls, loader, node):

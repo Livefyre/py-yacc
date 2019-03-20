@@ -10,7 +10,6 @@ EXTENSION_REGISTRY = {}
 
 
 def register(type_, factory="_yaml_constructor", repr_="_yaml_representer"):
-
     def _wrapper(cls):
         cls._yaml_tag = type_
 
@@ -20,9 +19,9 @@ def register(type_, factory="_yaml_constructor", repr_="_yaml_representer"):
             if dump:
                 dumper.add_representer(cls, dump)
 
+
         EXTENSION_REGISTRY[type_] = _register
         return cls
-
     return _wrapper
 
 
@@ -42,7 +41,6 @@ def dump(params, stream, Dumper=None, **kwargs):
 def getLoader():
     _register_types()
     return __Loader
-
 
 def getDumper():
     _register_types()
