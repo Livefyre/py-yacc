@@ -38,7 +38,8 @@ class YaccDescriptor(defaultdict):
         overlay = collections.defaultdict(dict)
         errors = []
 
-        def _collect((section, key, spec)):
+        def _collect(section_key_spec):
+            section, key, spec = section_key_spec
             if spec.error:
                 errors.append((section, key, spec.error))
                 return
@@ -48,13 +49,13 @@ class YaccDescriptor(defaultdict):
                 val = spec.value
             overlay[section][key] = spec.coerce(val)
 
-        map(_collect, self.specs())
+        list(map(_collect, self.specs()))
         return errors, dict(**overlay)
 
     def merge(self, overlay):
         """
         :param Dict[str, Dict[str, *]] overlay: values to merge.
         """
-        for section in filter(lambda s: s in self, overlay.keys()):
-            for key in filter(lambda k: k in self[section], overlay[section].keys()):
+        for section in [s for s in list(overlay.keys()) if s in self]:
+            for key in [k for k in list(overlay[section].keys()) if k in self[section]]:
                 self[section][key].value = overlay[section][key]

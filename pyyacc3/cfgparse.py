@@ -14,7 +14,7 @@ class ConfigParserAdaptor(object):
         return self.get(section, name, bool)
 
     def getint(self, section, name):
-        return self.get(section, name, (int, long))
+        return self.get(section, name, (int, int))
 
     def getfloat(self, section, name):
         return self.get(section, name, float)
@@ -34,13 +34,13 @@ class ConfigParserAdaptor(object):
         return name in self._params[section]
 
     def options(self, section):
-        return self._params[section].keys()
+        return list(self._params[section].keys())
 
     def items(self, section):
-        return self._params[section].items()
+        return list(self._params[section].items())
 
     def sections(self):
-        return self._params.keys()
+        return list(self._params.keys())
 
     def to_dict(self):
         return self._params

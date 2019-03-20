@@ -7,6 +7,7 @@ tests_require = ['tox', 'pytest', 'pytest-cov', 'mock', 'nose>=1.0', 'coverage',
 setup(
     name="py-yacc",
     version=__version__,
+    python_requires='>3.5.2',
     author="Nino Walker",
     author_email="nino.walker@gmail.com",
     description=("A YAML based configuration DSL and associated parser/validator."),
@@ -15,7 +16,7 @@ setup(
     packages=find_packages(exclude=('test',)),
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    install_requires=['PyYAML>=3.12', 'safeoutput'],
+    install_requires=['PyYAML>=3.13', 'safeoutput'],
     classifiers=[
         "License :: OSI Approved :: BSD License",
         'Development Status :: 5 - Production/Stable',
@@ -26,7 +27,7 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     tests_require=tests_require,
-    extras_require={'test': tests_require},
+    extras_require={'test': tests_require, 'dev': ['isort', 'yapf']},
     entry_points={
         'console_scripts': ['pyyacc.validate = pyyacc.scripts.compile:validate_main',  # deprecated
                             'pyyacc = pyyacc.scripts.compile:validate_main',

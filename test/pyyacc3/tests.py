@@ -1,4 +1,4 @@
-import StringIO
+import io
 import os
 import unittest
 
@@ -8,7 +8,7 @@ from pyyacc3.yml.extensions import Requirement, ConfigError
 
 
 def fd(yamlstr):
-    return StringIO.StringIO(yamlstr)
+    return io.StringIO(yamlstr)
 
 
 class BaseTest(unittest.TestCase):
@@ -17,14 +17,14 @@ class BaseTest(unittest.TestCase):
         return open(f)
 
     def fd(self, string):
-        return StringIO.StringIO(string)
+        return io.StringIO(string)
 
 
 class TestBuilder(BaseTest):
 
     def load(self, contents, *overlays):
         spec1 = fd(contents)
-        comp = Compiler().init(overlays=[spec1] + map(fd, overlays))
+        comp = Compiler().init(overlays=[spec1] + list(map(fd, overlays)))
         comp.load()
         return comp, comp.params, comp.errors
 
@@ -73,7 +73,7 @@ class TestBuilder(BaseTest):
     section:
       param: 2
         """)
-        self.assertEquals(params, dict(section=dict(param=2)))
+        self.assertEqual(params, dict(section=dict(param=2)))
 
     def test_overlay_2(self):
         comp, params, errors = self.load("""
@@ -190,7 +190,7 @@ class TestConfigParserFacade(BaseTest):
             self.assertEqual(method(section, key), params[section][key])
             assert isinstance(method(section, key), type_)
 
-        compare(f.get, "email", "from_address", basestring)
+        compare(f.get, "email", "from_address", str)
         compare(f.getint, "tests", "int", int)
         compare(f.getint, "misconfiguration_examples", "invalid_value", int)
         compare(f.getboolean, "tests", "bool", bool)

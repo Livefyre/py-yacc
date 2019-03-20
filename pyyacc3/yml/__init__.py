@@ -26,7 +26,7 @@ def register(type_, factory="_yaml_constructor", repr_="_yaml_representer"):
 
 
 def _register_types():
-    for type_ in EXTENSION_REGISTRY.keys():
+    for type_ in list(EXTENSION_REGISTRY.keys()):
         EXTENSION_REGISTRY.pop(type_)(__Loader, __Dumper)
 
 

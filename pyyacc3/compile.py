@@ -1,5 +1,5 @@
-from ConfigParser import ConfigParser
-import StringIO
+from configparser import ConfigParser
+import io
 from collections import defaultdict
 from contextlib import contextmanager
 import itertools
@@ -94,7 +94,7 @@ class Compiler(object):
 
     def argparse(self, args=sys.argv[1:]):
         (options, yamls) = self.parser().parse_args(args=args)
-        for k in filter(lambda k: k.startswith("arg_"), dir(options)):
+        for k in [k for k in dir(options) if k.startswith("arg_")]:
             setattr(self, k, getattr(options, k))
         self.arg_overlays = yamls
         if self.arg_verbose:
@@ -114,7 +114,7 @@ class Compiler(object):
                 return load(fn.read())
             return resolver.read_file(fn)
 
-        overlays = filter(None, map(parse, self.arg_overlays))
+        overlays = [_f for _f in map(parse, self.arg_overlays) if _f]
 
         if not overlays:
             raise ValueError("No valid descriptor or overlays provided: [%s]" % ", ".join(self.arg_overlays))
@@ -125,7 +125,7 @@ class Compiler(object):
         if not d:
             def reduce_():
                 d = defaultdict(dict)
-                for section in set(itertools.chain(*map(lambda o: o.keys(), overlays))):
+                for section in set(itertools.chain(*[list(o.keys()) for o in overlays])):
                     for o in overlays:
                         d[section].update(o.get(section, {}))
                 return dict(d)
@@ -148,7 +148,7 @@ class Compiler(object):
             d = defaultdict(dict)
             for section, key, err in self.errors:
                 d[section][key] = str(err)
-            buf = StringIO.StringIO()
+            buf = io.StringIO()
             dump(self.errors_to_dict(), buf, default_flow_style=False)
             raise ValueError(buf.getvalue())
 
@@ -188,7 +188,7 @@ class Compiler(object):
     @contextmanager
     def output_stream(self):
         o = self.arg_output
-        buf = StringIO.StringIO()
+        buf = io.StringIO()
         try:
             yield buf
         except:
@@ -200,7 +200,7 @@ class Compiler(object):
         if hasattr(o, 'write') and callable(o.write):
             o.write(buf.getvalue())
             return
-        assert isinstance(o, basestring), type(o)
+        assert isinstance(o, str), type(o)
         with safeopen(o) as fd:
             fd.write(buf.getvalue())
 
@@ -231,40 +231,35 @@ class Formatter(object):
 
     def format_ini(self, output):
         p = ConfigParser()
-        map(p.add_section, self.params.keys())
+        [p.add_section(s) for s in sorted(self.params.keys())]
 
-        def populate(section):
-            map(lambda (k, v): p.set(section, k, v), self.params[section].items())
+        for (section, key), value in self._flatten(lambda *args: args):
+            p.set(section, key, str(value))
 
-        map(populate, self.params.keys())
         p.write(output)
         
     def _flatten(self, norm_key):
         for section in sorted(self.params.keys()):
-            for key, value in sorted(self.params[section].items(), key=lambda (k,_v): k):
-                key = "%s__%s" % (norm_key(section), norm_key(key))
-                yield key, value
+            for key, value in sorted(list(self.params[section].items()), key=lambda k__v: k__v[0]):
+                yield norm_key(section, key), value
+
+    def _norm_sh_key(self, section, key):
+        return "%s__%s" % (section.upper().replace("-", "_"), key.upper().replace("-", "_"))
         
     def format_sh(self, output):
-        def _norm_sh_key(k):
-            return k.upper().replace("-", "_")
-
-        for key, value in self._flatten(_norm_sh_key):
+        for key, value in self._flatten(self._norm_sh_key):
             if value is None:
-                print >> output, "# %s is unset" % key
+                print("# %s is unset" % key, file=output)
                 continue
-            print >> output, "read -r -d '' %s<<EOF\n%s\nEOF\nexport %s" % (
-                key, str(value), key)
+            print("read -r -d '' %s<<EOF\n%s\nEOF\nexport %s" % (
+                key, str(value), key), file=output)
 
     def format_make(self, output):
-        def _norm_sh_key(k):
-            return k.upper().replace("-", "_")
-
-        for key, value in self._flatten(_norm_sh_key):
+        for key, value in self._flatten(self._norm_sh_key):
             if value is None:
-                print >> output, "# %s is unset" % key
+                print("# %s is unset" % key, file=output)
             else:
-                print >> output, "define %s\n%s\nendef" % (key, str(value))
+                print("define %s\n%s\nendef" % (key, str(value)), file=output)
 
 
 def main(args=sys.argv[1:]):

@@ -1,4 +1,4 @@
-import StringIO
+import io
 import unittest
 
 from pyyacc3.yml import load
@@ -15,7 +15,7 @@ class TestRegistration(unittest.TestCase):
 
 class TestParser(unittest.TestCase):
     def fd(self, string):
-        return StringIO.StringIO(string)
+        return io.StringIO(string)
 
     def test_parse_requirement(self):
         x = parse(self.fd("""!required "abc" """))

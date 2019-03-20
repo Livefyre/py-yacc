@@ -20,13 +20,14 @@ class Resolver(object):
         self.env_prefix = env_prefix
 
     def assemble(self, descriptor, provided_overlays, ignore_environment=False):
-        map(descriptor.merge, provided_overlays)
+        list(map(descriptor.merge, provided_overlays))
         if not ignore_environment:
-            map(descriptor.merge, self.get_extra_overlays())
+            list(map(descriptor.merge, self.get_extra_overlays()))
             descriptor.merge(self.get_env_overlay([(s, k) for s, k, _ in descriptor.specs()]))
 
     def finalize(self, descriptor):
-        def _final((section, key, spec)):
+        def _final(section_key_spec):
+            (section, key, spec) = section_key_spec
             LOG.debug("before - %s.%s=%s", section, key, spec.value)
             if isinstance(spec.value, EnvVar):
                 spec.value = spec.value.resolve(None)
@@ -37,7 +38,7 @@ class Resolver(object):
                 spec.error = err
             LOG.debug("after - %s.%s=%s (%s)", section, key, spec.value, err)
 
-        map(_final, descriptor.specs())
+        list(map(_final, descriptor.specs()))
 
     def get_extra_overlays(self):
         extra_overlays = os.environ.get(self.PYYACC_RESOLVER__OVERLAYS)
@@ -45,7 +46,7 @@ class Resolver(object):
             extra_overlays = [EnvVar(self.default_env_overlay)]
         else:
             extra_overlays = load(extra_overlays)
-        return filter(None, map(self._read, extra_overlays))
+        return [_f for _f in map(self._read, extra_overlays) if _f]
 
     def get_env_overlay(self, section_key_list):
         """
@@ -87,7 +88,7 @@ class Resolver(object):
             return load(sys.stdin.read())
         filename = os.path.expanduser(os.path.expandvars(fn))
         try:
-            filename = filter(os.path.exists, [filename, os.path.join(self.wdir, filename)])[0]
+            filename = list(filter(os.path.exists, [filename, os.path.join(self.wdir, filename)]))[0]
         except IndexError:
             raise IOError("%s does not exist (wd: %s)." % (filename, self.wdir))
         try:

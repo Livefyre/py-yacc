@@ -1,4 +1,4 @@
-import StringIO
+import io
 import os
 from unittest import TestCase
 
@@ -16,14 +16,14 @@ class TestCLI(TestCase):
     def argparse(self, cl, **kwargs):
         c = Compiler()
         c.argparse(cl.split(" "))
-        print c.__dict__
+        print(c.__dict__)
         self.assertValues(c, **kwargs)
         return c
 
     def assertValues(self, c, **kwargs):
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             cval = getattr(c, k)
-            self.assertEquals(v, cval, "%s: %s != %s" % (k, v, cval))
+            self.assertEqual(v, cval, "%s: %s != %s" % (k, v, cval))
 
     def test_basic_parse(self):
         self.argparse("--flat meow.yaml", arg_flat=True, arg_overlays=["meow.yaml"])
@@ -65,15 +65,15 @@ class TestCLI(TestCase):
         try:
             c.validate()
             assert False
-        except ValueError, e:
-            self.assertEquals(str(e), "meow:\n  moo: err\n")
+        except ValueError as e:
+            self.assertEqual(str(e), "meow:\n  moo: err\n")
 
     def test_load(self):
         c = Compiler()
         c.init(overlays=[SPEC_YAML_PATH])
         c.load()
-        self.assertEquals(3, len(c.errors))
-        self.assertEquals(100.1, c.params['tests']['float'])
+        self.assertEqual(3, len(c.errors))
+        self.assertEqual(100.1, c.params['tests']['float'])
 
     @patch('pyyacc3.compile.sys.stdout.write')
     def test_outputstream_stdout(self, write):
@@ -129,18 +129,18 @@ class TestFormatter(TestCase):
         fname = os.path.dirname(__file__) + "/expected-output-" + format_
         err_fname = fname + ".err"
         c = Compiler()
-        buf = StringIO.StringIO()
+        buf = io.StringIO()
         c.init(overlays=[os.path.join(os.path.dirname(__file__), "spec.yaml")],
                validate=False,
                format=format_,
                output=buf)
         c.execute()
         try:
-            self.assertEquals(open(fname).read(), buf.getvalue())
+            self.assertEqual(open(fname).read(), buf.getvalue())
         except:
             with open(err_fname, "w") as o:
                 o.write(buf.getvalue())
-            print "Failure; output rendered to: %s" % err_fname
+            print("Failure; output rendered to: %s" % err_fname)
             raise
 
     def test_format_yaml(self):

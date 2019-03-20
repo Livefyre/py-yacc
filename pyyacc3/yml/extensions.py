@@ -1,6 +1,6 @@
 from logging import getLogger
 import os
-import urlparse
+import urllib.parse
 
 from pyyacc3.yml import register
 
@@ -12,7 +12,7 @@ class _Scalar(object):
     'Provides a simple representer.'
     @classmethod
     def _yaml_representer(cls, dumper, data):
-        return dumper.represent_scalar(cls._yaml_tag, u"%s" % data, style='"')
+        return dumper.represent_scalar(cls._yaml_tag, "%s" % data, style='"')
 
 
 @register("!spec")
@@ -98,7 +98,7 @@ class Optional(_Scalar):
 
 
 @register("!uri")
-class URI(unicode, _Scalar):
+class URI(str, _Scalar):
     @classmethod
     def _yaml_constructor(cls, loader, node):
         return cls.pyyacc_coerce(loader.construct_scalar(node))
@@ -110,7 +110,7 @@ class URI(unicode, _Scalar):
         return p
 
     def parse(self):
-        return urlparse.urlparse(self)
+        return urllib.parse.urlparse(self)
 
     def validate(self):
         """
