@@ -37,8 +37,6 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'pyyacc.validate = pyyacc.scripts.compile:validate_main',  # deprecated
-            'pyyacc = pyyacc.scripts.compile:validate_main',
             'pyyacc3 = pyyacc3.compile:main'
         ]
     },
