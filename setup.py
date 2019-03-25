@@ -20,7 +20,7 @@ setup(
     packages=find_packages(exclude=('test',)),
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    install_requires=['PyYAML>=3.13', 'safeoutput'],
+    install_requires=['PyYAML>=5.1', 'safeoutput>=1.0'],
     classifiers=[
         "License :: OSI Approved :: BSD License",
         'Development Status :: 5 - Production/Stable',

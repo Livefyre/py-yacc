@@ -1,5 +1,5 @@
 
-# Pyyacc
+# pyyacc
 
 Python implementation of a Yet Another Configuration Compiler.
 
@@ -51,7 +51,7 @@ webserver:
     type: !!str ""
     value: !environment HOSTNAME
   ssl-private-key: !spec
-    description: 
+    description:
     sensitive: true
     type: !!str ""
     value: !required        
@@ -156,7 +156,7 @@ pyyacc3 -h
 ```
 
     Usage: pyyacc3 [options] yaml [yaml ...]
-    
+
     Options:
       -h, --help            show this help message and exit
       -v                    Verbose logging output.
@@ -173,3 +173,9 @@ pyyacc3 -h
       --env-overlay=ARG_ENV_OVERLAY
                             Name of an overlay to load from the environment
 
+
+# Release
+
+```bash
+make pypi.upload
+```
