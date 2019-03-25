@@ -1,4 +1,4 @@
-.PHONY: test
+.PHONY: test clean pypi.upload
 
 coverage: test
 	open cover/index.html
@@ -12,10 +12,13 @@ pypi.upload:
 env: env/bin/activate
 env/bin/activate: setup.py requirements.txt
 	test -f $@ || virtualenv -p python3 --no-site-packages env
-	env/bin/pip install -e . -e .[test] -e .[dev]
+	env/bin/pip3 install -e . -e .[test] -e .[dev]
 	touch $@
 
 
 lint:
 	env/bin/isort -q --recursive test pyyacc3
 	env/bin/yapf -i --recursive test pyyacc3
+
+clean:
+	rm -rf cover env
